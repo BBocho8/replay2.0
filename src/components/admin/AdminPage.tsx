@@ -11,6 +11,7 @@ export default function AdminPageComponent() {
 	useEffect(() => {
 		const fetchUser = async () => {
 			const user = await getCurrentUser();
+			console.log(user);
 			if (!user) {
 				router.push('/login');
 			} else {

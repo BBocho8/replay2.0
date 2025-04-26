@@ -1,7 +1,5 @@
-import AdminPageComponent from '@/components/admin/AdminPage';
+import { redirect } from 'next/navigation';
 
-const AdminPage = () => {
-	return <AdminPageComponent />;
-};
-
-export default AdminPage;
+export default function AdminPage() {
+	redirect('/admin/dashboard');
+}
