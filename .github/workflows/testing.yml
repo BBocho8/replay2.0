@@ -9,24 +9,26 @@ on:
       - main
 
 jobs:
-   # Secret scanning job to detect secrets in codebase
   secret-scanning:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4 # Check out the repository content to the runner
-      with:
-        fetch-depth: 0
-    - name: Run Gitleaks Scan
-      # Running Gitleaks to scan the code for secrets
-      run: |
-        docker run --rm -v $(pwd):/code -u $(id -u):$(id -g) zricethezav/gitleaks:v8.18.4@sha256:75bdb2b2f4db213cde0b8295f13a88d6b333091bbfbf3012a4e083d00d31caba -s /code detect --baseline-path /code/leaks-baseline.json -v
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Scan
+        run: |
+          docker run --rm -v $(pwd):/code -u $(id -u):$(id -g) zricethezav/gitleaks:v8.18.4@sha256:75bdb2b2f4db213cde0b8295f13a88d6b333091bbfbf3012a4e083d00d31caba -s /code detect --baseline-path /code/leaks-baseline.json -v
 
   build:
     runs-on: ubuntu-latest
-
+    env: 
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,14 +39,8 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      - name: Create .env file
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
-          echo "SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}" >> .env
-
       - name: Install dependencies
         run: npm ci
 
-      - name: Run build
+      - name: Build project
         run: npm run build

@@ -1,14 +1,18 @@
 'use client';
+
 import { type TProjectSetup, useProjectSetup } from '@/stores/sanity-store';
 import type { VideoV2 } from '@/types/Video';
 import { fetchVideosV2 } from '@/utils/fetchVideo';
+import { signOut } from '@/utils/supabase/auth';
+import { supabase } from '@/utils/supabase/supabaseClient';
 import { Box, Typography } from '@mui/material';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import removeAccents from 'remove-accents';
 import useSWR from 'swr';
 import { useOnClickOutside } from 'usehooks-ts';
@@ -27,23 +31,21 @@ const NavbarV2 = ({
 	supabaseUrl: string;
 	supabaseServiceRoleKey: string;
 }) => {
-	const { data: session } = useSession();
-
 	const { creds, setProjectSetup } = useProjectSetup();
-
 	const { data } = useSWR('fetchVideosV2', () => fetchVideosV2(projectId, dataset));
+	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
-	const ref = useRef(null);
 	const [query, setQuery] = useState('');
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const ref = useRef(null);
+
 	const getFilteredItems = (query: string, items: VideoV2[]) => {
-		if (!query) {
-			return items;
-		}
+		if (!query) return items;
 		if (query.length > 2) {
 			return items.filter(
 				game =>
-					removeAccents(game.homeTeam.toLowerCase()).includes(`${removeAccents(query.toLowerCase())}`) ||
-					removeAccents(game.awayTeam.toLowerCase()).includes(`${removeAccents(query.toLowerCase())}`),
+					removeAccents(game.homeTeam.toLowerCase()).includes(removeAccents(query.toLowerCase())) ||
+					removeAccents(game.awayTeam.toLowerCase()).includes(removeAccents(query.toLowerCase())),
 			);
 		}
 	};
@@ -72,10 +74,30 @@ const NavbarV2 = ({
 			supabaseUrl,
 			supabaseServiceRoleKey,
 		});
+
+		// 🧠 Detect user session
+		const checkSession = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			setIsLoggedIn(!!session);
+		};
+
+		checkSession();
+
+		// Optional: listen for login/logout events
+		const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+			setIsLoggedIn(!!session);
+		});
+
+		return () => {
+			listener.subscription.unsubscribe();
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
 	return (
-		<nav ref={ref} className='relative bg-white shadow '>
+		<nav ref={ref} className='relative bg-white shadow'>
 			<div className='container px-6 py-3 mx-auto md:flex'>
 				<div className='flex items-center justify-between'>
 					<Box
@@ -104,7 +126,7 @@ const NavbarV2 = ({
 					<div className='flex md:hidden'>
 						<button
 							type='button'
-							className='text-black  hover:text-primaryGreen  focus:outline-none focus:text-primaryGreen  cursor-pointer transition ease-in-out'
+							className='text-black hover:text-primaryGreen focus:outline-none focus:text-primaryGreen cursor-pointer transition ease-in-out'
 							aria-label='toggle menu'
 							onClick={() => setIsOpen(!isOpen)}
 							onKeyDown={e => {
@@ -114,26 +136,12 @@ const NavbarV2 = ({
 							}}
 						>
 							{isOpen ? (
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									className='w-6 h-6'
-									fill='none'
-									viewBox='0 0 24 24'
-									stroke='currentColor'
-									strokeWidth='2'
-								>
+								<svg className='w-6 h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
 									<title>Close Menu</title>
 									<path strokeLinecap='round' strokeLinejoin='round' d='M6 18L18 6M6 6l12 12' />
 								</svg>
 							) : (
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									className='w-6 h-6'
-									fill='none'
-									viewBox='0 0 24 24'
-									stroke='currentColor'
-									strokeWidth='2'
-								>
+								<svg className='w-6 h-6' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
 									<title>Open Menu</title>
 									<path strokeLinecap='round' strokeLinejoin='round' d='M4 8h16M4 16h16' />
 								</svg>
@@ -147,42 +155,40 @@ const NavbarV2 = ({
 						<Link
 							onClick={() => setIsOpen(false)}
 							href='/'
-							className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg  hover:bg-gray-100  md:mx-2'
+							className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg hover:bg-gray-100 md:mx-2'
 						>
 							Home
 						</Link>
 						<Link
 							onClick={() => setIsOpen(false)}
 							href='/replay'
-							className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg  hover:bg-gray-100  md:mx-2'
+							className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg hover:bg-gray-100 md:mx-2'
 						>
 							Replay
 						</Link>
-						{!!session && (
-							<>
-								<Link
-									onClick={() => setIsOpen(false)}
-									href='/admin'
-									className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg  hover:bg-gray-100  md:mx-2'
-								>
-									Admin
-								</Link>
-
-								<Typography
-									onClick={() => {
-										setIsOpen(false);
-										signOut({
-											callbackUrl: '/',
-											redirect: true,
-										});
-									}}
-									className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg  hover:bg-gray-100  md:mx-2 cursor-pointer'
-								>
-									Sign out
-								</Typography>
-							</>
+						<Link
+							onClick={() => setIsOpen(false)}
+							href='/admin'
+							className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg hover:bg-gray-100 md:mx-2'
+						>
+							Admin
+						</Link>
+						{isLoggedIn && (
+							<Typography
+								onClick={() => {
+									setIsOpen(false);
+									signOut();
+									toast.success('You have been logged out');
+									router.push('/');
+								}}
+								className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg hover:bg-gray-100 md:mx-2 cursor-pointer'
+							>
+								Sign out
+							</Typography>
 						)}
 					</div>
+
+					{/* Mobile Search */}
 					<div className='md:hidden'>
 						<div className='relative mt-2 md:mt-0'>
 							<span className='absolute inset-y-0 left-0 flex items-center pl-3'>
@@ -200,12 +206,13 @@ const NavbarV2 = ({
 
 							<input
 								type='text'
-								className='w-full py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg   focus:border-primaryGreen  focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-primaryGreen'
+								className='w-full py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:border-primaryGreen focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-primaryGreen'
 								onChange={e => setQuery(e.target.value)}
 								value={query || ''}
 								placeholder='Search for a game'
 							/>
 						</div>
+
 						<ul className='overflow-y-auto max-h-52'>
 							{query.length > 2 &&
 								filteredItems?.map(game => (

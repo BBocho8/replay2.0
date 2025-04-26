@@ -1,34 +1,31 @@
 'use client';
-
-import { schemaTypes } from '@/types/sanity';
+import { getCurrentUser } from '@/utils/supabase/auth';
 import { Box } from '@mui/material';
-import { visionTool } from '@sanity/vision';
-import { useSession } from 'next-auth/react';
-import { Studio, defineConfig } from 'sanity';
-import { structureTool } from 'sanity/structure';
-import AdminNotAuth from './AdminNotAuth';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-const AdminPageComponent = ({
-	adminUrl,
-	projectId,
-	dataset,
-}: { adminUrl: string; projectId: string; dataset: string }) => {
-	const { data: session } = useSession();
+export default function AdminPageComponent() {
+	const router = useRouter();
+	const [loading, setLoading] = useState(true);
 
-	const sanityConfig = defineConfig({
-		name: 'default',
-		title: 'sve-db',
+	useEffect(() => {
+		const fetchUser = async () => {
+			const user = await getCurrentUser();
+			console.log(user);
+			if (!user) {
+				router.push('/login');
+			} else {
+				setLoading(false);
+			}
+		};
+		fetchUser();
+	}, [router]);
 
-		projectId,
-		dataset,
-		basePath: '/admin',
-		plugins: [structureTool(), visionTool()],
-		schema: {
-			types: schemaTypes,
-		},
-	});
+	if (loading) {
+		return <div>Loading...</div>;
+	}
 
-	return session && session.user?.email === adminUrl ? (
+	return (
 		<Box
 			sx={{
 				height: '100vh',
@@ -38,11 +35,7 @@ const AdminPageComponent = ({
 				WebkitFontSmoothing: 'antialiased',
 			}}
 		>
-			<Studio config={sanityConfig} />
+			<p>Hellooooo I am connected !!!</p>
 		</Box>
-	) : (
-		<AdminNotAuth />
 	);
-};
-
-export default AdminPageComponent;
+}

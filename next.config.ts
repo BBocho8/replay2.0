@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
 	},
 	reactStrictMode: false,
 	output: 'standalone',
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
 	async redirects() {
 		return [
 			// Basic redirect

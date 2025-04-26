@@ -1,22 +1,16 @@
 import NavbarV2 from '@/components/main-components/NavbarV2';
-import SessionProvider from '@/components/providers/SessionProvider';
-import authOptions from '@/utils/auth';
 import { SWRProvider } from '@/utils/swr/swr-provider';
 import type { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
-import localFont from 'next/font/local';
+import { Roboto } from 'next/font/google';
+import { ToastContainer } from 'react-toastify';
 import Footer from '../components/main-components/Footer';
+
+import 'react-toastify/dist/ReactToastify.css';
 import './globals.css';
 
-const geistSans = localFont({
-	src: './fonts/GeistVF.woff',
-	variable: '--font-geist-sans',
-	weight: '100 900',
-});
-const geistMono = localFont({
-	src: './fonts/GeistMonoVF.woff',
-	variable: '--font-geist-mono',
-	weight: '100 900',
+const roboto = Roboto({
+	subsets: ['latin'],
+	weight: ['100', '300', '400', '500', '700', '900'],
 });
 
 export const metadata: Metadata = {
@@ -28,26 +22,23 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getServerSession(authOptions);
-
 	return (
 		<html lang='en'>
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<SessionProvider session={session}>
-					<SWRProvider>
-						<main>
-							<NavbarV2
-								projectId={process.env.SANITY_PROJECT_ID as string}
-								dataset={process.env.SANITY_DATASET as string}
-								token={process.env.SANITY_API_TOKEN as string}
-								supabaseUrl={process.env.SUPABASE_URL as string}
-								supabaseServiceRoleKey={process.env.SUPABASE_SERVICE_ROLE_KEY as string}
-							/>
-							{children}
-							<Footer />
-						</main>
-					</SWRProvider>
-				</SessionProvider>
+			<body className={`${roboto} antialiased`}>
+				<ToastContainer />
+				<SWRProvider>
+					<main>
+						<NavbarV2
+							projectId={process.env.SANITY_PROJECT_ID as string}
+							dataset={process.env.SANITY_DATASET as string}
+							token={process.env.SANITY_API_TOKEN as string}
+							supabaseUrl={process.env.SUPABASE_URL as string}
+							supabaseServiceRoleKey={process.env.SUPABASE_SERVICE_ROLE_KEY as string}
+						/>
+						{children}
+						<Footer />
+					</main>
+				</SWRProvider>
 			</body>
 		</html>
 	);
