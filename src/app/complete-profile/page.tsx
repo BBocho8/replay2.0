@@ -128,7 +128,7 @@ export default function CompleteProfilePage() {
 						onChange={e => setClubId(e.target.value)}
 					>
 						<option value=''>Select Your Club</option>
-						{clubs?.map((club: any) => (
+						{clubs?.map(club => (
 							<option key={club.id} value={club.id}>
 								{club.name}
 							</option>
