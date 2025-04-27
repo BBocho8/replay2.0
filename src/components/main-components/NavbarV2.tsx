@@ -8,27 +8,13 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import removeAccents from 'remove-accents';
 import { useOnClickOutside } from 'usehooks-ts';
 import logo from '../../../public/logo.png';
 
-const NavbarV2 = ({
-	projectId,
-	dataset,
-	token,
-	supabaseUrl,
-	supabaseServiceRoleKey,
-}: {
-	projectId: string;
-	dataset: string;
-	token: string;
-	supabaseUrl: string;
-	supabaseServiceRoleKey: string;
-}) => {
-	const router = useRouter();
+const NavbarV2 = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
