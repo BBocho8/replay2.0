@@ -2,11 +2,8 @@
 
 import { Pagination, ThemeProvider, createTheme } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
 
-import Loading from '@/app/loading';
-import { useProjectSetup } from '@/stores/sanity-store';
-import { fetchVideosV2 } from '@/utils/fetchVideo';
+import games from '@/utils/tempData';
 import GamesContainer from './GamesContainer';
 
 const theme = createTheme({
@@ -17,20 +14,13 @@ const competitions = ['Bezirksliga', 'Kreisfreundschaftsspiele', 'Rheinlandpokal
 const ROWS_PER_PAGE = 10;
 
 const Replay = () => {
-	const { creds } = useProjectSetup();
-	const {
-		data: games,
-		isLoading,
-		error,
-	} = useSWR('fetchVideosV2', () => fetchVideosV2(creds?.projectId as string, creds?.dataset as string));
-
 	const [selectedCompetition, setSelectedCompetition] = useState('all');
 	const [currentPage, setCurrentPage] = useState(1);
 
 	const filteredGames = useMemo(() => {
 		if (!games) return [];
 		return selectedCompetition === 'all' ? games : games.filter(game => game.competition === selectedCompetition);
-	}, [games, selectedCompetition]);
+	}, [selectedCompetition]);
 
 	const totalPages = Math.ceil(filteredGames.length / ROWS_PER_PAGE);
 	const paginatedGames = useMemo(
@@ -47,9 +37,6 @@ const Replay = () => {
 	useEffect(() => {
 		setCurrentPage(1);
 	}, [selectedCompetition]);
-
-	if (isLoading) return <Loading />;
-	if (error) return <p>Error loading games...</p>;
 
 	return (
 		<section>

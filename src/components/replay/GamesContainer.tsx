@@ -1,4 +1,4 @@
-import type { VideoV2 } from '@/types/Video';
+import type { Game } from '@/utils/tempData';
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '../../../public/logo.png';
@@ -15,7 +15,7 @@ const GamesContainer = ({
 	date,
 	firstHalf1,
 	fullGame,
-}: Partial<VideoV2>) => {
+}: Partial<Game>) => {
 	// Check if the video is available and get the thumbnail
 	const videoThumbnail = getYoutubeID(firstHalf1) || getYoutubeID(fullGame);
 
