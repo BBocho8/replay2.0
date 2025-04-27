@@ -162,11 +162,11 @@ const NavbarV2 = ({
 						</Link>
 						{isLoggedIn && (
 							<Typography
-								onClick={() => {
+								onClick={async () => {
 									setIsOpen(false);
-									signOut();
+									await signOut();
 									toast.success('You have been logged out');
-									router.push('/');
+									window.location.href = '/';
 								}}
 								className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg hover:bg-gray-100 md:mx-2 cursor-pointer'
 							>
