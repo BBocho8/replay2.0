@@ -1,5 +1,7 @@
 import NavbarV2 from '@/components/main-components/NavbarV2';
 import { SWRProvider } from '@/utils/swr/swr-provider';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
@@ -26,6 +28,8 @@ export default async function RootLayout({
 		<html lang='en'>
 			<body className={`${roboto} antialiased`}>
 				<ToastContainer />
+				<SpeedInsights />
+				<Analytics />
 				<SWRProvider>
 					<main>
 						<NavbarV2
