@@ -17,6 +17,12 @@ export interface Club {
 	id: string; // UUID
 	name: string;
 	is_validated: boolean;
+	competitions: string[]; // Array of competition IDs
+}
+
+export interface Competition {
+	id: string; // UUID
+	name: string;
 }
 
 // ✅ matches table

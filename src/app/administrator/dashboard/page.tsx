@@ -2,14 +2,13 @@
 
 import CreateMatchForm from '@/components/admin/CreateMatchForm';
 import PendingUsersList from '@/components/admin/PendingUsersList';
-// (Optional later) import PendingClubsList from '@/components/admin/PendingClubsList';
-// (Optional later) import AdminStatsCard from '@/components/admin/AdminStatsCard';
-
 import { createClient } from '@/utils/supabase/supabaseClient';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function AdminDashboardPage() {
 	const supabase = createClient();
+	const router = useRouter();
 	const [fullName, setFullName] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -26,7 +25,18 @@ export default function AdminDashboardPage() {
 	return (
 		<div className='min-h-screen bg-gray-100 p-6'>
 			<div className='max-w-7xl mx-auto'>
-				<h1 className='text-3xl font-bold mb-8'>Welcome{fullName ? `, ${fullName}` : ''} 👋</h1>
+				<div className='flex items-center justify-between mb-8'>
+					<h1 className='text-3xl font-bold'>Welcome{fullName ? `, ${fullName}` : ''} 👋</h1>
+
+					{/* Button to manage competitions */}
+					<button
+						type='button'
+						onClick={() => router.push('/administrator/dashboard/competitions')}
+						className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+					>
+						Manage Competitions
+					</button>
+				</div>
 
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
 					{/* Left: Pending Users */}
@@ -41,8 +51,6 @@ export default function AdminDashboardPage() {
 						<CreateMatchForm />
 					</div>
 				</div>
-
-				{/* (Optional) Future grid expansion for PendingClubsList or AdminStatsCard */}
 			</div>
 		</div>
 	);
