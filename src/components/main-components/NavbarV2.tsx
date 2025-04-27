@@ -1,6 +1,7 @@
 'use client';
 
 import { signOut } from '@/utils/supabase/auth';
+import { createClient } from '@/utils/supabase/supabaseClient';
 import data from '@/utils/tempData';
 import { Box, Typography } from '@mui/material';
 import classNames from 'classnames';
@@ -8,7 +9,7 @@ import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import removeAccents from 'remove-accents';
 import { useOnClickOutside } from 'usehooks-ts';
@@ -31,7 +32,31 @@ const NavbarV2 = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const supabase = createClient();
+
 	const ref = useRef(null);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		const checkSession = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			setIsLoggedIn(!!session); // true if session exists, false otherwise
+		};
+
+		checkSession();
+
+		// Optional: Listen to session changes
+		const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+			setIsLoggedIn(!!session);
+		});
+
+		// Clean up listener
+		return () => {
+			listener.subscription.unsubscribe();
+		};
+	}, []);
 
 	const getFilteredItems = (query: string, items: typeof data) => {
 		if (!query) return items;
