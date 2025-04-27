@@ -17,13 +17,14 @@ export default function LoginPage() {
 			await signIn(email, password);
 			toast.success('Login successful!');
 
-			// ✅ Force refresh session before navigating
+			// ✅ Force refresh session (optional, but good practice)
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
 
 			if (session) {
-				router.push('/administrator/dashboard');
+				// ✅ Force hard reload to let middleware detect new session
+				window.location.href = '/administrator/dashboard';
 			} else {
 				toast.error('Session not established, please try again.');
 			}
