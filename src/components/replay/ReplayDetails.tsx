@@ -1,4 +1,4 @@
-import type { VideoV2 } from '@/types/Video';
+import type { Game } from '@/utils/tempData';
 import { useState } from 'react';
 import GameHeader from './GameHeader';
 import GamePartsButtons from './GamePartsButtons';
@@ -15,7 +15,7 @@ type GamePart =
 	| '';
 
 type ReplayDetailsProps = {
-	game: VideoV2;
+	game: Game;
 };
 
 const ReplayDetails = ({ game }: ReplayDetailsProps) => {

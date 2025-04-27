@@ -1,20 +1,16 @@
 'use client';
 
-import { type TProjectSetup, useProjectSetup } from '@/stores/sanity-store';
-import type { VideoV2 } from '@/types/Video';
-import { fetchVideosV2 } from '@/utils/fetchVideo';
 import { signOut } from '@/utils/supabase/auth';
-import { createClient } from '@/utils/supabase/supabaseClient';
+import data from '@/utils/tempData';
 import { Box, Typography } from '@mui/material';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import removeAccents from 'remove-accents';
-import useSWR from 'swr';
 import { useOnClickOutside } from 'usehooks-ts';
 import logo from '../../../public/logo.png';
 
@@ -31,16 +27,13 @@ const NavbarV2 = ({
 	supabaseUrl: string;
 	supabaseServiceRoleKey: string;
 }) => {
-	const { creds, setProjectSetup } = useProjectSetup();
-	const { data } = useSWR('fetchVideosV2', () => fetchVideosV2(projectId, dataset));
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const ref = useRef(null);
-	const supabase = createClient();
 
-	const getFilteredItems = (query: string, items: VideoV2[]) => {
+	const getFilteredItems = (query: string, items: typeof data) => {
 		if (!query) return items;
 		if (query.length > 2) {
 			return items.filter(
@@ -64,39 +57,6 @@ const NavbarV2 = ({
 		'opacity-0 -translate-x-full': !isOpen,
 		'translate-x-0 opacity-100': isOpen,
 	});
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		setProjectSetup({
-			...(creds as TProjectSetup | undefined),
-			projectId,
-			dataset,
-			token,
-			supabaseUrl,
-			supabaseServiceRoleKey,
-		});
-
-		// 🧠 Detect user session
-		const checkSession = async () => {
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
-
-			setIsLoggedIn(!!session);
-		};
-
-		checkSession();
-
-		// Optional: listen for login/logout events
-		const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-			setIsLoggedIn(!!session);
-		});
-
-		return () => {
-			listener.subscription.unsubscribe();
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	return (
 		<nav ref={ref} className='relative bg-white shadow'>
