@@ -12,44 +12,9 @@ export default function LoginPage() {
 
 	const handleSubmit = async () => {
 		try {
-			// 1. Sign in
 			await signIn(email, password);
 			toast.success('Login successful!');
-
-			// // 2. Fetch user info
-			// const {
-			// 	data: { user },
-			// } = await supabase.auth.getUser();
-			// if (!user) {
-			// 	toast.error('Failed to fetch user after login.');
-			// 	return;
-			// }
-
-			// // 3. Check if user profile exists
-			// const { data: existingProfile, error: profileError } = await supabase
-			// 	.from('users')
-			// 	.select('id')
-			// 	.eq('id', user.id)
-			// 	.maybeSingle();
-
-			// if (profileError) {
-			// 	toast.error('Failed to check user profile.');
-			// 	console.error(profileError);
-			// 	return;
-			// }
-
-			// // 4. If no profile, create one
-			// if (!existingProfile) {
-			// 	await supabase.from('users').insert({
-			// 		id: user.id,
-			// 		role: 'player', // Default role if missing (can improve later)
-			// 		club_id: null,
-			// 		is_validated: false,
-			// 	});
-			// }
-
-			// 5. Redirect
-			router.push('/admin'); // (or dynamic based on role later)
+			router.push('/administrator');
 		} catch (error) {
 			console.error(error);
 			toast.error('Login failed. Please check your credentials.');

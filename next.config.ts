@@ -16,22 +16,6 @@ const nextConfig: NextConfig = {
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
-	async redirects() {
-		return [
-			// Basic redirect
-			// {
-			//   source: '/about',
-			//   destination: '/',
-			//   permanent: true,
-			// },
-			// Wildcard path matching
-			{
-				source: '/admin/:slug',
-				destination: '/admin/:slug',
-				permanent: true,
-			},
-		];
-	},
 };
 
 export default nextConfig;

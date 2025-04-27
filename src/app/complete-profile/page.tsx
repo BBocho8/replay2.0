@@ -1,12 +1,13 @@
 'use client';
 
-import { supabase } from '@/utils/supabase/supabaseClient';
+import { createClient } from '@/utils/supabase/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import useSWR from 'swr';
 
 export default function CompleteProfilePage() {
+	const supabase = createClient();
 	const router = useRouter();
 	const [fullName, setFullName] = useState('');
 	const [role, setRole] = useState<'player' | 'coach' | 'admin'>('player');
@@ -75,7 +76,7 @@ export default function CompleteProfilePage() {
 			toast.success('Profile completed successfully!');
 
 			// Redirect
-			router.push(`${role === 'admin' ? '/admin' : '/pending-approval'}`);
+			router.push(`${role === 'admin' ? '/administrator' : '/pending-approval'}`);
 		} catch (error) {
 			console.error(error);
 			toast.error('Failed to complete profile.');
