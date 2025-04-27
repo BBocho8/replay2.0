@@ -17,6 +17,7 @@
 		"@mui/material": "^6.4.4",
 		"@sanity/vision": "^3.75.0",
 		"@supabase/auth-helpers-nextjs": "^0.10.0",
+		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.49.4",
 		"classnames": "^2.5.1",
 		"dayjs": "^1.11.13",

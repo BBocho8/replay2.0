@@ -1,81 +1,69 @@
 'use client';
 
-import { supabase } from '@/utils/supabase/supabaseClient';
-import { useState } from 'react';
-import { toast } from 'react-toastify';
+import type { User } from '@/types/supabase/database';
 import useSWR from 'swr';
 
 const fetchPendingUsers = async () => {
-	const { data, error } = await supabase.from('users').select('id, full_name, role, club_id').eq('is_validated', false);
+	const res = await fetch('/api/admin/list-users');
+	if (!res.ok) throw new Error('Failed to fetch users');
+	const users = await res.json();
+	return users.filter((user: User) => !user.is_validated);
+};
 
-	if (error) throw error;
-	return data;
+const approveUser = async (userId: string) => {
+	await fetch('/api/admin/approve-user', {
+		method: 'PATCH',
+		body: JSON.stringify({ id: userId }),
+		headers: { 'Content-Type': 'application/json' },
+	});
+};
+
+const rejectUser = async (userId: string) => {
+	await fetch('/api/admin/reject-user', {
+		method: 'DELETE',
+		body: JSON.stringify({ id: userId }),
+		headers: { 'Content-Type': 'application/json' },
+	});
 };
 
 export default function PendingUsersList() {
-	const { data: users, isLoading, mutate } = useSWR('pending-users', fetchPendingUsers);
-	const [actionLoading, setActionLoading] = useState<string | null>(null);
+	const { data: pendingUsers, error, isLoading, mutate } = useSWR('pending-users', fetchPendingUsers);
 
-	const handleApprove = async (userId: string) => {
-		try {
-			setActionLoading(userId);
-			const { error } = await supabase.from('users').update({ is_validated: true }).eq('id', userId);
+	if (isLoading) return <p>Loading...</p>;
+	if (error || !pendingUsers) return <p>Error: {error.message}</p>;
 
-			if (error) throw error;
-			toast.success('User approved!');
-			mutate(); // Refresh list
-		} catch (error) {
-			console.error(error);
-			toast.error('Failed to approve user.');
-		} finally {
-			setActionLoading(null);
-		}
-	};
-
-	const handleReject = async (userId: string) => {
-		try {
-			setActionLoading(userId);
-			const { error } = await supabase.from('users').delete().eq('id', userId);
-
-			if (error) throw error;
-			toast.success('User rejected and deleted.');
-			mutate(); // Refresh list
-		} catch (error) {
-			console.error(error);
-			toast.error('Failed to reject user.');
-		} finally {
-			setActionLoading(null);
-		}
-	};
-
-	if (isLoading) return <p>Loading pending users...</p>;
-
-	if (!users || users.length === 0) return <p>No pending users.</p>;
+	if (pendingUsers.length === 0) {
+		return <p>No pending users 🎉</p>;
+	}
 
 	return (
-		<ul className='space-y-4'>
-			{users.map((user: any) => (
-				<li key={user.id} className='bg-gray-50 p-4 rounded shadow flex justify-between items-center'>
+		<ul className='space-y-2'>
+			{pendingUsers.map((user: User) => (
+				<li key={user.id} className='bg-white p-4 rounded shadow flex justify-between items-center'>
 					<div>
-						<p className='font-semibold'>{user.full_name || 'No Name'}</p>
-						<p className='text-sm text-gray-600 capitalize'>{user.role}</p>
+						<p className='font-bold'>{user.full_name}</p>
+						<p className='text-sm text-gray-500'>{user.role}</p>
 					</div>
-					<div className='flex gap-2'>
+					<div className='flex space-x-2'>
 						<button
 							type='button'
-							onClick={() => handleApprove(user.id)}
-							className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded'
-							disabled={actionLoading === user.id}
+							className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+							onClick={async () => {
+								await approveUser(user.id);
+								mutate(); // refresh the list after approve
+							}}
 						>
-							{actionLoading === user.id ? 'Loading...' : 'Approve'}
+							Approve ✅
 						</button>
 						<button
 							type='button'
-							onClick={() => handleReject(user.id)}
-							className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded'
-							disabled={actionLoading === user.id}
+							className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+							onClick={async () => {
+								await rejectUser(user.id);
+								mutate(); // refresh the list after reject
+							}}
 						>
-							{actionLoading === user.id ? 'Loading...' : 'Reject'}
+							Reject ❌
 						</button>
 					</div>
 				</li>

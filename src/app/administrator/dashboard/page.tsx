@@ -5,10 +5,11 @@ import PendingUsersList from '@/components/admin/PendingUsersList';
 // (Optional later) import PendingClubsList from '@/components/admin/PendingClubsList';
 // (Optional later) import AdminStatsCard from '@/components/admin/AdminStatsCard';
 
-import { supabase } from '@/utils/supabase/supabaseClient';
+import { createClient } from '@/utils/supabase/supabaseClient';
 import { useEffect, useState } from 'react';
 
 export default function AdminDashboardPage() {
+	const supabase = createClient();
 	const [fullName, setFullName] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -20,7 +21,7 @@ export default function AdminDashboardPage() {
 		};
 
 		fetchUser();
-	}, []);
+	}, [supabase]);
 
 	return (
 		<div className='min-h-screen bg-gray-100 p-6'>

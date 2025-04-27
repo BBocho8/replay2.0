@@ -4,7 +4,7 @@ import { type TProjectSetup, useProjectSetup } from '@/stores/sanity-store';
 import type { VideoV2 } from '@/types/Video';
 import { fetchVideosV2 } from '@/utils/fetchVideo';
 import { signOut } from '@/utils/supabase/auth';
-import { supabase } from '@/utils/supabase/supabaseClient';
+import { createClient } from '@/utils/supabase/supabaseClient';
 import { Box, Typography } from '@mui/material';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -38,6 +38,7 @@ const NavbarV2 = ({
 	const [query, setQuery] = useState('');
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const ref = useRef(null);
+	const supabase = createClient();
 
 	const getFilteredItems = (query: string, items: VideoV2[]) => {
 		if (!query) return items;
@@ -80,6 +81,7 @@ const NavbarV2 = ({
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
+
 			setIsLoggedIn(!!session);
 		};
 
@@ -168,7 +170,7 @@ const NavbarV2 = ({
 						</Link>
 						<Link
 							onClick={() => setIsOpen(false)}
-							href='/admin'
+							href='/administrator'
 							className='px-2.5 py-1 text-gray-700 font-bold transition-colors duration-300 transform rounded-lg hover:bg-gray-100 md:mx-2'
 						>
 							Admin
