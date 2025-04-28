@@ -1,17 +1,46 @@
 'use client';
 
 import { useDashboardStats } from '@/hook/useDashboardStats';
-import type { Match } from '@/types/supabase/database';
+import { createClient } from '@/utils/supabase/supabaseClient';
 import { Button, Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+const supabase = createClient();
 
 export default function DashboardPage() {
-	const { stats, isLoading, error } = useDashboardStats();
+	const { stats, isLoading: statsLoading, error: statsError } = useDashboardStats();
+	const [recentMatches, setRecentMatches] = useState<
+		{
+			id: string;
+			home_team: string;
+			away_team: string;
+			home_score: number | null;
+			away_score: number | null;
+			date: string;
+		}[]
+	>([]);
+	const [loadingMatches, setLoadingMatches] = useState(true);
 
-	const recentMatches: Match[] = []; // Fetch real data later
+	useEffect(() => {
+		const fetchRecentMatches = async () => {
+			const { data, error } = await supabase
+				.from('matches')
+				.select('id, home_team, away_team, home_score, away_score, date')
+				.order('date', { ascending: false })
+				.limit(5); // Last 5 matches
 
-	if (isLoading) {
+			if (!error && data) {
+				setRecentMatches(data);
+			}
+			setLoadingMatches(false);
+		};
+
+		fetchRecentMatches();
+	}, []);
+
+	if (statsLoading || loadingMatches) {
 		return (
 			<div className='flex justify-center items-center h-60'>
 				<CircularProgress />
@@ -19,7 +48,7 @@ export default function DashboardPage() {
 		);
 	}
 
-	if (error) {
+	if (statsError) {
 		return (
 			<div className='flex justify-center items-center h-60'>
 				<Typography color='error'>Failed to load dashboard data.</Typography>
@@ -91,8 +120,11 @@ export default function DashboardPage() {
 				) : (
 					<ul className='space-y-2'>
 						{recentMatches.map(match => (
-							<li key={match.id} className='bg-white rounded p-4 shadow flex justify-between items-center'>
-								<div>
+							<li
+								key={match.id}
+								className='bg-white rounded p-4 shadow flex justify-between items-center dark:bg-gray-800'
+							>
+								<div className='font-medium'>
 									{match.home_team} vs {match.away_team}
 								</div>
 								<div className='text-sm text-gray-500'>{dayjs(match.date).format('DD/MM/YYYY')}</div>
