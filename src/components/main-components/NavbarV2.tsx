@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import removeAccents from 'remove-accents';
 import { useOnClickOutside } from 'usehooks-ts';
 import logo from '../../../public/logo.png';
+import DarkModeToggleButton from './DarkModeToggleButton';
 
 const NavbarV2 = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -159,6 +160,8 @@ const NavbarV2 = () => {
 								Sign out
 							</Typography>
 						)}
+
+						<DarkModeToggleButton />
 					</div>
 
 					{/* Mobile Search */}

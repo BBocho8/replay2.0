@@ -1,56 +1,105 @@
 'use client';
 
-import CreateMatchForm from '@/components/admin/CreateMatchForm';
-import PendingUsersList from '@/components/admin/PendingUsersList';
-import { createClient } from '@/utils/supabase/supabaseClient';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useDashboardStats } from '@/hook/useDashboardStats';
+import type { Match } from '@/types/supabase/database';
+import { Button, Card, CardContent, CircularProgress, Typography } from '@mui/material';
+import dayjs from 'dayjs';
+import Link from 'next/link';
 
-export default function AdminDashboardPage() {
-	const supabase = createClient();
-	const router = useRouter();
-	const [fullName, setFullName] = useState<string | null>(null);
+export default function DashboardPage() {
+	const { stats, isLoading, error } = useDashboardStats();
 
-	useEffect(() => {
-		const fetchUser = async () => {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			setFullName(user?.user_metadata?.full_name || null);
-		};
+	const recentMatches: Match[] = []; // Fetch real data later
 
-		fetchUser();
-	}, [supabase]);
+	if (isLoading) {
+		return (
+			<div className='flex justify-center items-center h-60'>
+				<CircularProgress />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className='flex justify-center items-center h-60'>
+				<Typography color='error'>Failed to load dashboard data.</Typography>
+			</div>
+		);
+	}
 
 	return (
-		<div className='min-h-screen bg-gray-100 p-6'>
-			<div className='max-w-7xl mx-auto'>
-				<div className='flex items-center justify-between mb-8'>
-					<h1 className='text-3xl font-bold'>Welcome{fullName ? `, ${fullName}` : ''} 👋</h1>
+		<div className='p-6 space-y-8'>
+			{/* Quick Actions */}
+			<div className='flex flex-wrap gap-4'>
+				<Link href='/administrator/matches'>
+					<Button variant='contained' color='primary'>
+						Create Match
+					</Button>
+				</Link>
+				<Link href='/administrator/competitions'>
+					<Button variant='contained' color='secondary'>
+						Add Competition
+					</Button>
+				</Link>
+				<Link href='/administrator/people'>
+					<Button variant='outlined'>Manage People</Button>
+				</Link>
+			</div>
 
-					{/* Button to manage competitions */}
-					<button
-						type='button'
-						onClick={() => router.push('/administrator/dashboard/competitions')}
-						className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-					>
-						Manage Competitions
-					</button>
-				</div>
+			{/* Metrics */}
+			<div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
+				<Card className='shadow'>
+					<CardContent>
+						<Typography variant='h6' className='mb-2'>
+							Matches Played
+						</Typography>
+						<Typography variant='h4'>{stats?.matches}</Typography>
+					</CardContent>
+				</Card>
+				<Card className='shadow'>
+					<CardContent>
+						<Typography variant='h6' className='mb-2'>
+							Competitions
+						</Typography>
+						<Typography variant='h4'>{stats?.competitions}</Typography>
+					</CardContent>
+				</Card>
+				<Card className='shadow'>
+					<CardContent>
+						<Typography variant='h6' className='mb-2'>
+							Players
+						</Typography>
+						<Typography variant='h4'>{stats?.players}</Typography>
+					</CardContent>
+				</Card>
+				<Card className='shadow'>
+					<CardContent>
+						<Typography variant='h6' className='mb-2'>
+							Coaches
+						</Typography>
+						<Typography variant='h4'>{stats?.coaches}</Typography>
+					</CardContent>
+				</Card>
+			</div>
 
-				<div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-					{/* Left: Pending Users */}
-					<div className='bg-white p-6 rounded-lg shadow'>
-						<h2 className='text-xl font-bold mb-4'>Pending Players/Coaches</h2>
-						<PendingUsersList />
-					</div>
+			{/* Recent Matches */}
+			<div className='space-y-4'>
+				<Typography variant='h5'>Recent Matches</Typography>
 
-					{/* Right: Create Match */}
-					<div className='bg-white p-6 rounded-lg shadow'>
-						<h2 className='text-xl font-bold mb-4'>Create a New Match</h2>
-						<CreateMatchForm />
-					</div>
-				</div>
+				{recentMatches.length === 0 ? (
+					<div className='text-gray-500'>No recent matches available.</div>
+				) : (
+					<ul className='space-y-2'>
+						{recentMatches.map(match => (
+							<li key={match.id} className='bg-white rounded p-4 shadow flex justify-between items-center'>
+								<div>
+									{match.home_team} vs {match.away_team}
+								</div>
+								<div className='text-sm text-gray-500'>{dayjs(match.date).format('DD/MM/YYYY')}</div>
+							</li>
+						))}
+					</ul>
+				)}
 			</div>
 		</div>
 	);
