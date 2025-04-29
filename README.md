@@ -3,7 +3,7 @@
 This is the **admin interface** for managing clubs, competitions, matches, and users (players & coaches) for the [SVE Replay](https://github.com/your-repo) platform.
 
 Built with:
-- [Next.js](https://nextjs.org/) 14 (App Router)
+- [Next.js](https://nextjs.org/) 15 (App Router)
 - [Supabase](https://supabase.com/) (PostgreSQL, Auth, RLS)
 - [Material UI](https://mui.com/) + TailwindCSS
 - [SWR](https://swr.vercel.app/) for data fetching
