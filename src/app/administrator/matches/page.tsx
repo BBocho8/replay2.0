@@ -3,11 +3,26 @@
 import DeleteMatchDialog from '@/components/matches/DeleteMatchDialog';
 import EditMatchDialog from '@/components/matches/EditMatchDialog';
 import NewMatchDialog from '@/components/matches/NewMatchDialog';
+import { usePagination } from '@/utils/mui/use-pagination';
 import { createClient } from '@/utils/supabase/supabaseClient';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Button, CircularProgress, List, ListItem, ListItemText, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import {
+	Box,
+	Button,
+	CircularProgress,
+	IconButton,
+	Paper,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TablePagination,
+	TableRow,
+	TextField,
+	Typography,
+} from '@mui/material';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -18,8 +33,8 @@ const supabase = createClient();
 async function fetchMatches() {
 	const { data, error } = await supabase
 		.from('matches')
-		.select('id, home_team, away_team, home_score, away_score, date')
-		.order('date', { ascending: true });
+		.select('id, home_team, away_team, home_score, away_score, date, competition_id, competitions(name)')
+		.order('date', { ascending: false });
 
 	if (error) {
 		throw error;
@@ -36,6 +51,10 @@ export default function ManageMatchesPage() {
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 	const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 	const { mutate } = useSWRConfig();
+	const [searchQuery, setSearchQuery] = useState('');
+
+	// Pagination state
+	const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = usePagination();
 
 	if (isLoading) {
 		return (
@@ -54,13 +73,18 @@ export default function ManageMatchesPage() {
 		);
 	}
 
+	const filteredMatches =
+		matches && matches.length > 0
+			? matches
+					.filter((match: any) => {
+						const query = searchQuery.toLowerCase();
+						return match.home_team.toLowerCase().includes(query) || match.away_team.toLowerCase().includes(query);
+					})
+					.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+			: [];
+
 	return (
-		<Box
-			p={6}
-			sx={{
-				minHeight: '100vh',
-			}}
-		>
+		<Box p={6} sx={{ minHeight: '100vh' }}>
 			<Typography variant='h4' fontWeight='bold' mb={4}>
 				Manage Matches
 			</Typography>
@@ -68,49 +92,91 @@ export default function ManageMatchesPage() {
 			<Button variant='contained' onClick={() => setOpenNewMatch(true)} sx={{ mb: 4 }}>
 				Create New Match
 			</Button>
+			<Box mb={4}>
+				<TextField
+					label='Search matches'
+					variant='outlined'
+					fullWidth
+					value={searchQuery}
+					onChange={e => setSearchQuery(e.target.value)}
+					placeholder='Search by team name...'
+				/>
+			</Box>
 
-			{matches && matches.length > 0 ? (
-				<List>
-					{matches?.map((match: any) => (
-						<ListItem
-							key={match.id}
-							divider
-							secondaryAction={
-								<Box sx={{ display: 'flex', gap: 1 }}>
-									<IconButton
-										edge='end'
-										aria-label='edit'
-										onClick={() => {
-											setSelectedMatch(match);
-											setOpenEditDialog(true);
-										}}
-									>
-										<EditIcon />
-									</IconButton>
-									<IconButton
-										edge='end'
-										aria-label='delete'
-										onClick={() => {
-											setSelectedMatchId(match.id);
-											setOpenDeleteDialog(true);
-										}}
-									>
-										<DeleteIcon />
-									</IconButton>
-								</Box>
-							}
-						>
-							<ListItemText
-								primary={`${match.home_team} vs ${match.away_team}`}
-								secondary={dayjs(match.date).format('MMM D, YYYY')}
-							/>
-						</ListItem>
-					))}
-				</List>
-			) : (
-				<Typography>No matches found.</Typography>
-			)}
+			<Paper>
+				<TableContainer>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>Home Team</TableCell>
+								<TableCell>Away Team</TableCell>
+								<TableCell>Date</TableCell>
+								<TableCell>Score</TableCell>
+								<TableCell>Competition</TableCell>
+								<TableCell align='right'>Actions</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{filteredMatches.length > 0 ? (
+								filteredMatches.map((match: any) => (
+									<TableRow key={match.id} hover>
+										<TableCell>{match.home_team}</TableCell>
+										<TableCell>{match.away_team}</TableCell>
+										<TableCell>{dayjs(match?.date).format('MMM D, YYYY HH:mm')}</TableCell>
+										<TableCell>
+											{match.home_score != null && match.away_score != null
+												? `${match.home_score} - ${match.away_score}`
+												: 'Not played yet'}
+										</TableCell>
+										<TableCell>{match?.competitions?.name}</TableCell>
+										<TableCell align='right'>
+											<Box display='flex' justifyContent='flex-end' gap={1}>
+												<IconButton
+													edge='end'
+													aria-label='edit'
+													onClick={() => {
+														setSelectedMatch(match);
+														setOpenEditDialog(true);
+													}}
+												>
+													<EditIcon />
+												</IconButton>
+												<IconButton
+													edge='end'
+													aria-label='delete'
+													onClick={() => {
+														setSelectedMatchId(match.id);
+														setOpenDeleteDialog(true);
+													}}
+												>
+													<DeleteIcon />
+												</IconButton>
+											</Box>
+										</TableCell>
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell colSpan={6} align='center'>
+										<Typography>No matches found.</Typography>
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</TableContainer>
+				<TablePagination
+					component='div'
+					count={filteredMatches.length}
+					page={page}
+					onPageChange={handleChangePage}
+					rowsPerPage={rowsPerPage}
+					onRowsPerPageChange={handleChangeRowsPerPage}
+					rowsPerPageOptions={[5, 10, 20]}
+				/>
+			</Paper>
 
+			{/* Dialogs */}
 			<NewMatchDialog open={openNewMatch} onClose={() => setOpenNewMatch(false)} onCreated={() => mutate('matches')} />
 
 			{selectedMatch && (

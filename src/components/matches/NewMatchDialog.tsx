@@ -3,12 +3,22 @@
 import type dayjs from '@/utils/dayjs';
 import { hasTheGameBeenPlayed } from '@/utils/matches/has-game-been-played';
 import { createClient } from '@/utils/supabase/supabaseClient';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from '@mui/material';
+import {
+	Box,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	Grid,
+	MenuItem,
+	TextField,
+} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import 'dayjs/locale/de';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 const supabase = createClient();
@@ -25,10 +35,38 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 	const [date, setDate] = useState<dayjs.Dayjs | null>(null);
 	const [homeScore, setHomeScore] = useState<number | ''>('');
 	const [awayScore, setAwayScore] = useState<number | ''>('');
+	const [competitionId, setCompetitionId] = useState<string>('');
+	const [competitions, setCompetitions] = useState<{ id: string; name: string }[]>([]);
 	const [loading, setLoading] = useState(false);
 
+	useEffect(() => {
+		const fetchCompetitions = async () => {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			if (!user) return;
+
+			const { data: profile } = await supabase.from('users').select('club_id').eq('id', user.id).single();
+
+			if (!profile?.club_id) return;
+
+			const { data: club } = await supabase.from('clubs').select('competitions').eq('id', profile.club_id).single();
+
+			if (!club?.competitions?.length) return;
+
+			const { data: competitionList } = await supabase
+				.from('competitions')
+				.select('id, name')
+				.in('id', club.competitions);
+
+			if (competitionList) setCompetitions(competitionList);
+		};
+
+		if (open) fetchCompetitions();
+	}, [open]);
+
 	const handleCreate = async () => {
-		if (!homeTeam || !awayTeam || !date) {
+		if (!homeTeam || !awayTeam || !date || !competitionId) {
 			toast.error('Please fill in all fields');
 			return;
 		}
@@ -43,7 +81,7 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 
 			const { data: profile, error: profileError } = await supabase
 				.from('users')
-				.select('club_id')
+				.select('club_id, id')
 				.eq('id', user.id)
 				.single();
 
@@ -54,8 +92,9 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 			const { error } = await supabase.from('matches').insert({
 				home_team: homeTeam,
 				away_team: awayTeam,
-				date: date ? date.utc().format() : null,
+				date: date ? date.format() : null,
 				club_id: profile.club_id,
+				competition_id: competitionId,
 				home_score: homeScore === '' ? null : homeScore,
 				away_score: awayScore === '' ? null : awayScore,
 			});
@@ -72,6 +111,7 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 			setDate(null);
 			setHomeScore('');
 			setAwayScore('');
+			setCompetitionId('');
 		} catch (error) {
 			console.error(error);
 			toast.error('Failed to create match');
@@ -97,30 +137,32 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 							</LocalizationProvider>
 						</Grid>
 
-						<Grid
-							size={{
-								xs: 12,
-								md: 6,
-							}}
-						>
+						<Grid size={{ xs: 12 }}>
+							<TextField
+								select
+								label='Competition'
+								value={competitionId}
+								onChange={e => setCompetitionId(e.target.value)}
+								fullWidth
+							>
+								{competitions.map(c => (
+									<MenuItem key={c.id} value={c.id}>
+										{c.name}
+									</MenuItem>
+								))}
+							</TextField>
+						</Grid>
+
+						<Grid size={{ xs: 12, md: 6 }}>
 							<TextField label='Home Team' value={homeTeam} onChange={e => setHomeTeam(e.target.value)} fullWidth />
 						</Grid>
+
 						{hasTheGameBeenPlayed(date) && (
-							<Grid
-								size={{
-									xs: 12,
-									md: 6,
-								}}
-							>
+							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField
 									label='Home Score'
 									type='number'
-									slotProps={{
-										htmlInput: {
-											min: '0',
-											step: '1',
-										},
-									}}
+									slotProps={{ htmlInput: { min: '0', step: '1' } }}
 									aria-valuemin={0}
 									value={homeScore}
 									onChange={e => setHomeScore(e.target.value === '' ? '' : Number(e.target.value))}
@@ -128,30 +170,17 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 								/>
 							</Grid>
 						)}
-						<Grid
-							size={{
-								xs: 12,
-								md: 6,
-							}}
-						>
+
+						<Grid size={{ xs: 12, md: 6 }}>
 							<TextField label='Away Team' value={awayTeam} onChange={e => setAwayTeam(e.target.value)} fullWidth />
 						</Grid>
+
 						{hasTheGameBeenPlayed(date) && (
-							<Grid
-								size={{
-									xs: 12,
-									md: 6,
-								}}
-							>
+							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField
 									label='Away Score'
 									type='number'
-									slotProps={{
-										htmlInput: {
-											min: '0',
-											step: '1',
-										},
-									}}
+									slotProps={{ htmlInput: { min: '0', step: '1' } }}
 									value={awayScore}
 									onChange={e => setAwayScore(e.target.value === '' ? '' : Number(e.target.value))}
 									fullWidth

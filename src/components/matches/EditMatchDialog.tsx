@@ -3,7 +3,17 @@
 import dayjs from '@/utils/dayjs';
 import { hasTheGameBeenPlayed } from '@/utils/matches/has-game-been-played';
 import { createClient } from '@/utils/supabase/supabaseClient';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from '@mui/material';
+import {
+	Box,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	Grid,
+	MenuItem,
+	TextField,
+} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -24,6 +34,7 @@ interface EditMatchDialogProps {
 		date: string;
 		home_score: number | null;
 		away_score: number | null;
+		competition_id: string | null;
 	};
 }
 
@@ -32,8 +43,10 @@ export default function EditMatchDialog({ open, onClose, onUpdated, match }: Edi
 	const [awayTeam, setAwayTeam] = useState(match.away_team);
 	const [homeScore, setHomeScore] = useState<number | ''>(match.home_score ?? '');
 	const [awayScore, setAwayScore] = useState<number | ''>(match.away_score ?? '');
-	const [loading, setLoading] = useState(false);
 	const [date, setDate] = useState<dayjs.Dayjs | null>(null);
+	const [competitionId, setCompetitionId] = useState<string>(match.competition_id ?? '');
+	const [competitions, setCompetitions] = useState<{ id: string; name: string }[]>([]);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		if (match.date) {
@@ -43,8 +56,34 @@ export default function EditMatchDialog({ open, onClose, onUpdated, match }: Edi
 		}
 	}, [match.date]);
 
+	useEffect(() => {
+		const fetchCompetitions = async () => {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			if (!user) return;
+
+			const { data: profile } = await supabase.from('users').select('club_id').eq('id', user.id).single();
+
+			if (!profile?.club_id) return;
+
+			const { data: club } = await supabase.from('clubs').select('competitions').eq('id', profile.club_id).single();
+
+			if (!club?.competitions?.length) return;
+
+			const { data: competitionList } = await supabase
+				.from('competitions')
+				.select('id, name')
+				.in('id', club.competitions);
+
+			if (competitionList) setCompetitions(competitionList);
+		};
+
+		if (open) fetchCompetitions();
+	}, [open]);
+
 	const handleUpdate = async () => {
-		if (!homeTeam || !awayTeam || !date) {
+		if (!homeTeam || !awayTeam || !date || !competitionId) {
 			toast.error('Please fill in all fields');
 			return;
 		}
@@ -56,7 +95,8 @@ export default function EditMatchDialog({ open, onClose, onUpdated, match }: Edi
 			.update({
 				home_team: homeTeam,
 				away_team: awayTeam,
-				date: date ? date.utc().format() : null,
+				date: date ? date.format() : null,
+				competition_id: competitionId,
 				home_score: homeScore === '' ? null : homeScore,
 				away_score: awayScore === '' ? null : awayScore,
 			})
@@ -90,21 +130,29 @@ export default function EditMatchDialog({ open, onClose, onUpdated, match }: Edi
 								/>
 							</LocalizationProvider>
 						</Grid>
-						<Grid
-							size={{
-								xs: 12,
-								md: 6,
-							}}
-						>
+
+						<Grid size={{ xs: 12 }}>
+							<TextField
+								select
+								label='Competition'
+								value={competitionId}
+								onChange={e => setCompetitionId(e.target.value)}
+								fullWidth
+							>
+								{competitions.map(c => (
+									<MenuItem key={c.id} value={c.id}>
+										{c.name}
+									</MenuItem>
+								))}
+							</TextField>
+						</Grid>
+
+						<Grid size={{ xs: 12, md: 6 }}>
 							<TextField label='Home Team' value={homeTeam} onChange={e => setHomeTeam(e.target.value)} fullWidth />
 						</Grid>
+
 						{hasTheGameBeenPlayed(date) && (
-							<Grid
-								size={{
-									xs: 12,
-									md: 6,
-								}}
-							>
+							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField
 									label='Home Score'
 									type='number'
@@ -114,21 +162,13 @@ export default function EditMatchDialog({ open, onClose, onUpdated, match }: Edi
 								/>
 							</Grid>
 						)}
-						<Grid
-							size={{
-								xs: 12,
-								md: 6,
-							}}
-						>
+
+						<Grid size={{ xs: 12, md: 6 }}>
 							<TextField label='Away Team' value={awayTeam} onChange={e => setAwayTeam(e.target.value)} fullWidth />
 						</Grid>
+
 						{hasTheGameBeenPlayed(date) && (
-							<Grid
-								size={{
-									xs: 12,
-									md: 6,
-								}}
-							>
+							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField
 									label='Away Score'
 									type='number'
