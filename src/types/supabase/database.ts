@@ -21,35 +21,22 @@ export interface Club {
 }
 
 export interface Competition {
-	id: string; // UUID
+	id: string;
 	name: string;
+	created_at: string;
+	created_by: string;
 }
 
 // ✅ matches table
 export interface Match {
-	id: string; // UUID
-	home_team: string;
-	away_team: string;
-	home_score: number;
-	away_score: number;
-	date: string; // ISO datetime string
-	competition: string;
-	video_url: string; // full game URL (or we can extend to parts if needed)
-}
-
-export interface Match {
 	id: string;
+	competition_id: string;
 	home_team: string;
 	away_team: string;
 	home_score: number;
 	away_score: number;
 	date: string;
-	competition: string;
-	full_game_url: string | null;
-	first_half1_url?: string | null;
-	first_half2_url?: string | null;
-	first_half3_url?: string | null;
-	second_half1_url?: string | null;
-	second_half2_url?: string | null;
-	second_half3_url?: string | null;
+	created_at: string;
+	created_by: string;
+	club_id: string;
 }
