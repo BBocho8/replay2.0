@@ -70,8 +70,8 @@ export default function DashboardPage() {
 						Add Competition
 					</Button>
 				</Link>
-				<Link href='/administrator/people'>
-					<Button variant='outlined'>Manage People</Button>
+				<Link href='/administrator/users'>
+					<Button variant='outlined'>Manage Users</Button>
 				</Link>
 			</div>
 
@@ -107,6 +107,14 @@ export default function DashboardPage() {
 							Coaches
 						</Typography>
 						<Typography variant='h4'>{stats?.coaches}</Typography>
+					</CardContent>
+				</Card>{' '}
+				<Card className='shadow'>
+					<CardContent>
+						<Typography variant='h6' className='mb-2'>
+							Admins
+						</Typography>
+						<Typography variant='h4'>{stats?.admins}</Typography>
 					</CardContent>
 				</Card>
 			</div>

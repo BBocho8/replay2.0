@@ -1,4 +1,4 @@
-import NavbarManager from '@/components/main-components/NavbarManger';
+import NavbarManager from '@/components/main-components/NavbarManager';
 import { ThemeRegistry } from '@/theme';
 import { SWRProvider } from '@/utils/swr/swr-provider';
 import { Analytics } from '@vercel/analytics/react';

@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server';
 export async function GET() {
 	const supabase = createAdminClient(); // ✅
 
-	const { data: users, error } = await supabase.from('users').select('id, full_name, role, club_id, is_validated');
+	const { data: users, error } = await supabase
+		.from('users')
+		.select('id, full_name, email, role, club_id, is_validated');
 
 	if (error) {
 		console.error('Error fetching users:', error);
