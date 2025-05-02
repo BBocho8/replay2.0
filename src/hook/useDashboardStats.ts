@@ -5,6 +5,14 @@ import useSWR from 'swr';
 
 const supabase = createClient();
 
+type ClubStats = {
+	match_count: number;
+	competition_count: number;
+	player_count: number;
+	coach_count: number;
+	admin_count: number;
+};
+
 async function fetchDashboardStats() {
 	const {
 		data: { user },
@@ -12,32 +20,18 @@ async function fetchDashboardStats() {
 	if (!user) throw new Error('User not logged in');
 
 	const { data: profile } = await supabase.from('users').select('club_id').eq('id', user.id).maybeSingle();
-	if (!profile || !profile.club_id) throw new Error('Club not assigned');
+	if (!profile?.club_id) throw new Error('Club not assigned');
 
-	const [matchesRes, usersRes, playersRes, coachesRes] = await Promise.all([
-		supabase.from('matches').select('id', { count: 'exact', head: true }).eq('club_id', profile.club_id),
-		supabase.from('users').select('id', { count: 'exact', head: true }).eq('club_id', profile.club_id),
-		supabase
-			.from('users')
-			.select('id', { count: 'exact', head: true })
-			.eq('club_id', profile.club_id)
-			.eq('role', 'player'),
-		supabase
-			.from('users')
-			.select('id', { count: 'exact', head: true })
-			.eq('club_id', profile.club_id)
-			.eq('role', 'coach'),
-	]);
+	const { data: stats, error } = await supabase.from('club_stats_view').select('*').eq('id', profile.club_id).single();
 
-	const { data: club } = await supabase.from('clubs').select('competitions').eq('id', profile.club_id).maybeSingle();
-	if (!club || !club.competitions) throw new Error('Club not found');
+	if (error || !stats) throw new Error('Failed to fetch club stats');
 
 	return {
-		matches: matchesRes.count || 0,
-		competitions: club.competitions.length || 0,
-		users: usersRes.count || 0,
-		players: playersRes.count || 0,
-		coaches: coachesRes.count || 0,
+		matches: stats.match_count || 0,
+		competitions: stats.competition_count || 0,
+		players: stats.player_count || 0,
+		coaches: stats.coach_count || 0,
+		admins: stats.admin_count || 0,
 	};
 }
 

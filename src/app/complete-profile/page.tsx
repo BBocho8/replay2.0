@@ -69,6 +69,7 @@ export default function CompleteProfilePage() {
 				id: user.id,
 				full_name: fullName,
 				role,
+				email: user.email,
 				club_id: finalClubId || null,
 				is_validated: role === 'admin',
 			});
