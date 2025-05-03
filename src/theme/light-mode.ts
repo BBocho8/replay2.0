@@ -21,21 +21,36 @@ export const lightThemeOptions: ThemeOptions = {
 		},
 	},
 	typography: {
-		...baseTheme.typography,
 		fontFamily: "'Roboto', sans-serif",
 		h1: {
-			...baseTheme.typography.h1,
-			fontSize: baseTheme.typography.pxToRem(32),
+			fontSize: '2rem',
 			fontWeight: 700,
 		},
 		h2: {
-			...baseTheme.typography.h2,
-			fontSize: baseTheme.typography.pxToRem(28),
+			fontSize: '1.75rem',
 			fontWeight: 600,
 		},
+		h3: {
+			fontSize: '1.5rem',
+			fontWeight: 600,
+		},
+		h4: {
+			fontSize: '1.25rem',
+			fontWeight: 600,
+		},
+		h5: {
+			fontSize: '1.125rem',
+			fontWeight: 500,
+		},
+		h6: {
+			fontSize: '1rem',
+			fontWeight: 500,
+		},
 		body1: {
-			...baseTheme.typography.body1,
-			fontSize: baseTheme.typography.pxToRem(16),
+			fontSize: '1rem',
+		},
+		body2: {
+			fontSize: '0.875rem',
 		},
 	},
 };

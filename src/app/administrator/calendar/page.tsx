@@ -93,8 +93,8 @@ export default function ManageCalendarPage() {
 	}, []);
 
 	return (
-		<Box p={4} position='relative'>
-			<Typography variant='h4' fontWeight='bold' gutterBottom>
+		<Box p={6}>
+			<Typography color='text.primary' variant='h4' fontWeight='bold' mb={4}>
 				Manage Calendar
 			</Typography>
 

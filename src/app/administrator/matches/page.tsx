@@ -88,8 +88,8 @@ export default function ManageMatchesPage() {
 			: [];
 
 	return (
-		<Box p={6} sx={{ minHeight: '100vh' }}>
-			<Typography variant='h4' fontWeight='bold' mb={4}>
+		<Box p={6}>
+			<Typography color='text.primary' variant='h4' fontWeight='bold' mb={4}>
 				Manage Matches
 			</Typography>
 
