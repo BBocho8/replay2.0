@@ -1,4 +1,4 @@
-import FooterLanding from '@/components/main-components/FooterLanding';
+import FooterManager from '@/components/main-components/FooterManager';
 import NavbarManager from '@/components/main-components/NavbarManager';
 import { ThemeRegistry } from '@/theme';
 import '@/utils/dayjs';
@@ -37,7 +37,7 @@ export default function RootLayout({
 						<div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
 							<NavbarManager />
 							<main style={{ flex: 1 }}>{children}</main>
-							<FooterLanding />
+							<FooterManager />
 						</div>
 					</SWRProvider>
 				</ThemeRegistry>
