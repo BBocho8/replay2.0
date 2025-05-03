@@ -10,15 +10,20 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import MenuIcon from '@mui/icons-material/Menu';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import PeopleIcon from '@mui/icons-material/People';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import {
 	AppBar,
+	Avatar,
+	Badge,
 	Box,
+	Button,
 	Drawer,
 	IconButton,
 	List,
 	ListItemButton,
+	Stack,
 	Toolbar,
 	Tooltip,
 	Typography,
@@ -29,8 +34,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const expandedDrawerWidth = 240;
-const collapsedDrawerWidth = 84;
+export const expandedDrawerWidth = 240;
+export const collapsedDrawerWidth = 100;
 
 const navItems = [
 	{ text: 'Dashboard', href: '/administrator/dashboard', icon: <DashboardIcon /> },
@@ -167,7 +172,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 	);
 
 	return (
-		<Box display='flex' height='100vh'>
+		<Box
+			display='flex'
+			height='100vh'
+			sx={{
+				width: '100%',
+				overflow: 'hidden',
+				position: 'relative',
+			}}
+		>
 			<AppBar
 				position='fixed'
 				sx={{
@@ -176,6 +189,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 					backgroundColor: 'background.paper',
 					color: 'text.primary',
 					boxShadow: theme.palette.mode === 'dark' ? '0 1px 2px rgba(0,0,0,0.5)' : '0 1px 2px rgba(0,0,0,0.1)',
+					zIndex: theme.zIndex.drawer + 1,
 				}}
 			>
 				<Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -184,10 +198,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 							<MenuIcon />
 						</IconButton>
 					)}
-					<Typography fontWeight='bold' fontSize='1.25rem'>
-						Administrator
-					</Typography>
-					{!isMobile && <DarkModeToggleButton />}
+					<Stack direction='row' spacing={2} alignItems='center'>
+						<Typography fontWeight='bold' fontSize='1.25rem'>
+							Administrator
+						</Typography>
+						<Button
+							variant='outlined'
+							size='small'
+							sx={{
+								ml: 2,
+								textTransform: 'none',
+								borderRadius: 2,
+							}}
+						>
+							Quick Actions
+						</Button>
+					</Stack>
+					<Stack direction='row' spacing={1} alignItems='center'>
+						<IconButton color='inherit'>
+							<Badge badgeContent={3} color='error'>
+								<NotificationsIcon />
+							</Badge>
+						</IconButton>
+						<Avatar
+							sx={{
+								width: 32,
+								height: 32,
+								bgcolor: 'primary.main',
+							}}
+						>
+							A
+						</Avatar>
+						{!isMobile && <DarkModeToggleButton />}
+					</Stack>
 				</Toolbar>
 			</AppBar>
 
@@ -228,17 +271,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 				)}
 			</nav>
 
-			<main
-				style={{
+			<Box
+				component='main'
+				sx={{
 					flexGrow: 1,
-					padding: theme.spacing(3),
-					marginTop: 64,
+					width: { md: `calc(100% - ${collapsed ? collapsedDrawerWidth : expandedDrawerWidth}px)` },
+					mt: '64px',
+					minHeight: '100vh',
+					height: 'calc(100vh - 64px)',
+					overflow: 'auto',
 					backgroundColor: theme.palette.mode === 'light' ? '#f5f5f5' : theme.palette.background.default,
 					transition: 'all 0.3s ease',
+					p: { xs: 2, md: 3 },
+					position: 'relative',
+					zIndex: 0,
 				}}
 			>
 				{children}
-			</main>
+			</Box>
 		</Box>
 	);
 }
