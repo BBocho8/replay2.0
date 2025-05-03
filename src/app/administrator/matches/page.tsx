@@ -27,7 +27,7 @@ import {
 	Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { toast } from 'react-toastify';
 import useSWR, { useSWRConfig } from 'swr';
 
@@ -126,8 +126,8 @@ export default function ManageMatchesPage() {
 									const isExpanded = expandedMatchId === match.id;
 
 									return (
-										<>
-											<TableRow key={`${match.id} - Match Row`} hover>
+										<Fragment key={match.id}>
+											<TableRow hover>
 												<TableCell>{match.home_team}</TableCell>
 												<TableCell>{match.away_team}</TableCell>
 												<TableCell>{dayjs(match?.date).format('MMM D, YYYY HH:mm')}</TableCell>
@@ -199,7 +199,7 @@ export default function ManageMatchesPage() {
 													</TableCell>
 												</TableRow>
 											)}
-										</>
+										</Fragment>
 									);
 								})
 							) : (

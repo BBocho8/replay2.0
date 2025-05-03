@@ -17,7 +17,6 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import 'dayjs/locale/de';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -127,7 +126,7 @@ export default function NewMatchDialog({ open, onClose, onCreated }: NewMatchDia
 				<Box mt={2}>
 					<Grid container spacing={2}>
 						<Grid size={{ xs: 12 }}>
-							<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de'>
+							<LocalizationProvider dateAdapter={AdapterDayjs}>
 								<DateTimePicker
 									label='Date'
 									value={date}

@@ -1,6 +1,5 @@
 'use client';
 
-import dayjs from '@/utils/dayjs';
 import { hasTheGameBeenPlayed } from '@/utils/matches/has-game-been-played';
 import { createClient } from '@/utils/supabase/supabaseClient';
 import {
@@ -17,7 +16,7 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import 'dayjs/locale/de';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -121,7 +120,7 @@ export default function EditMatchDialog({ open, onClose, onUpdated, match }: Edi
 				<Box mt={2}>
 					<Grid container spacing={2}>
 						<Grid size={{ xs: 12 }}>
-							<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de'>
+							<LocalizationProvider dateAdapter={AdapterDayjs}>
 								<DateTimePicker
 									label='Date'
 									value={date}
