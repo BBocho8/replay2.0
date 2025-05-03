@@ -1,30 +1,30 @@
 'use client';
 
 import { Analytics, Groups, Security, SportsSoccer } from '@mui/icons-material';
-import { Avatar, Box, Card, CardContent, Container, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardContent, Container, Divider, Grid, Stack, Typography } from '@mui/material';
 
 export default function AboutPage() {
 	return (
 		<Box sx={{ py: 10 }}>
 			<Container>
-				<Typography variant='h3' gutterBottom>
+				{/* Header */}
+				<Typography variant='h3' gutterBottom textAlign='center' fontWeight={700}>
 					About Match Replay
 				</Typography>
-				<Typography variant='body1' color='text.secondary' paragraph>
-					Match Replay is a modern platform designed to help football clubs streamline team operations. Built by a team
-					of footballers and developers, it bridges the gap between sport and technology — giving local clubs powerful
-					tools usually reserved for professionals.
+				<Typography variant='body1' color='text.secondary' paragraph textAlign='center' maxWidth='md' mx='auto'>
+					Match Replay is a modern platform designed to help football clubs streamline team operations...
 				</Typography>
-				<Typography variant='body1' color='text.secondary' paragraph>
+				<Typography variant='body1' color='text.secondary' paragraph textAlign='center' maxWidth='md' mx='auto'>
 					From organizing match footage to managing player fines, scheduling training, and keeping the team informed,
 					Match Replay does it all in one unified system.
 				</Typography>
 
 				<Divider sx={{ my: 6 }} />
 
+				{/* Mission and Why */}
 				<Grid container spacing={4}>
 					<Grid size={{ xs: 12, md: 6 }}>
-						<Typography variant='h5' gutterBottom>
+						<Typography variant='h4' gutterBottom fontWeight={600}>
 							Why We Built It
 						</Typography>
 						<Typography variant='body1' color='text.secondary'>
@@ -35,7 +35,7 @@ export default function AboutPage() {
 					</Grid>
 
 					<Grid size={{ xs: 12, md: 6 }}>
-						<Typography variant='h5' gutterBottom>
+						<Typography variant='h4' gutterBottom fontWeight={600}>
 							Our Mission
 						</Typography>
 						<Typography variant='body1' color='text.secondary'>
@@ -47,76 +47,69 @@ export default function AboutPage() {
 
 				<Divider sx={{ my: 6 }} />
 
-				<Typography variant='h4' gutterBottom>
-					Key Features
-				</Typography>
-				<Grid container spacing={4} sx={{ mt: 2 }}>
-					<Grid size={{ xs: 12, sm: 6, md: 3 }}>
-						<Card sx={{ height: '100%' }}>
-							<CardContent>
-								<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-									<Avatar sx={{ bgcolor: 'primary.main' }}>
-										<SportsSoccer />
-									</Avatar>
-									<Typography variant='h6'>Match Analysis</Typography>
-								</Stack>
-								<Typography variant='body2' color='text.secondary'>
-									Advanced video analysis tools to break down matches, track player performance, and identify areas for
-									improvement.
-								</Typography>
-							</CardContent>
-						</Card>
+				{/* Key Features */}
+				<Box sx={{ bgcolor: 'background.paper', py: 8 }}>
+					<Typography variant='h4' gutterBottom fontWeight={700} textAlign='center'>
+						Key Features
+					</Typography>
+					<Grid container spacing={4} sx={{ mt: 2 }}>
+						{[
+							{
+								icon: <SportsSoccer />,
+								title: 'Match Analysis',
+								desc: 'Advanced video analysis tools to break down matches, track player performance, and identify areas for improvement.',
+							},
+							{
+								icon: <Groups />,
+								title: 'Team Management',
+								desc: 'Comprehensive tools for managing player rosters, training schedules, and team communications.',
+							},
+							{
+								icon: <Analytics />,
+								title: 'Performance Analytics',
+								desc: 'Data-driven insights to track team progress, player development, and tactical effectiveness.',
+							},
+							{
+								icon: <Security />,
+								title: 'Secure Platform',
+								desc: "Enterprise-grade security to protect your team's data and ensure privacy compliance.",
+							},
+						].map(feat => (
+							<Grid
+								size={{
+									xs: 12,
+									sm: 6,
+									md: 3,
+								}}
+								key={feat.title}
+							>
+								<Card
+									sx={{
+										height: '100%',
+										transition: 'all 0.3s ease',
+										'&:hover': { transform: 'translateY(-4px)', boxShadow: 6 },
+										borderRadius: 2,
+									}}
+								>
+									<CardContent>
+										<Stack direction='row' alignItems='center' spacing={2} mb={2}>
+											<Avatar sx={{ bgcolor: 'primary.main' }}>{feat.icon}</Avatar>
+											<Typography variant='h6'>{feat.title}</Typography>
+										</Stack>
+										<Typography variant='body2' color='text.secondary'>
+											{feat.desc}
+										</Typography>
+									</CardContent>
+								</Card>
+							</Grid>
+						))}
 					</Grid>
-					<Grid size={{ xs: 12, sm: 6, md: 3 }}>
-						<Card sx={{ height: '100%' }}>
-							<CardContent>
-								<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-									<Avatar sx={{ bgcolor: 'primary.main' }}>
-										<Groups />
-									</Avatar>
-									<Typography variant='h6'>Team Management</Typography>
-								</Stack>
-								<Typography variant='body2' color='text.secondary'>
-									Comprehensive tools for managing player rosters, training schedules, and team communications.
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid size={{ xs: 12, sm: 6, md: 3 }}>
-						<Card sx={{ height: '100%' }}>
-							<CardContent>
-								<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-									<Avatar sx={{ bgcolor: 'primary.main' }}>
-										<Analytics />
-									</Avatar>
-									<Typography variant='h6'>Performance Analytics</Typography>
-								</Stack>
-								<Typography variant='body2' color='text.secondary'>
-									Data-driven insights to track team progress, player development, and tactical effectiveness.
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid size={{ xs: 12, sm: 6, md: 3 }}>
-						<Card sx={{ height: '100%' }}>
-							<CardContent>
-								<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-									<Avatar sx={{ bgcolor: 'primary.main' }}>
-										<Security />
-									</Avatar>
-									<Typography variant='h6'>Secure Platform</Typography>
-								</Stack>
-								<Typography variant='body2' color='text.secondary'>
-									Enterprise-grade security to protect your team's data and ensure privacy compliance.
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-				</Grid>
+				</Box>
 
 				<Divider sx={{ my: 6 }} />
 
-				<Typography variant='h4' gutterBottom>
+				{/* Tech Stack */}
+				<Typography variant='h4' gutterBottom fontWeight={700}>
 					Our Technology
 				</Typography>
 				<Typography variant='body1' color='text.secondary' paragraph>
@@ -125,7 +118,7 @@ export default function AboutPage() {
 				</Typography>
 				<Grid container spacing={2} sx={{ mt: 2 }}>
 					<Grid size={{ xs: 12, md: 4 }}>
-						<Card>
+						<Card sx={{ borderRadius: 2, boxShadow: 3 }}>
 							<CardContent>
 								<Typography variant='h6' gutterBottom>
 									Frontend
@@ -137,7 +130,7 @@ export default function AboutPage() {
 						</Card>
 					</Grid>
 					<Grid size={{ xs: 12, md: 4 }}>
-						<Card>
+						<Card sx={{ borderRadius: 2, boxShadow: 3 }}>
 							<CardContent>
 								<Typography variant='h6' gutterBottom>
 									Backend
@@ -149,7 +142,7 @@ export default function AboutPage() {
 						</Card>
 					</Grid>
 					<Grid size={{ xs: 12, md: 4 }}>
-						<Card>
+						<Card sx={{ borderRadius: 2, boxShadow: 3 }}>
 							<CardContent>
 								<Typography variant='h6' gutterBottom>
 									Infrastructure
@@ -164,13 +157,27 @@ export default function AboutPage() {
 
 				<Divider sx={{ my: 6 }} />
 
-				<Typography variant='h4' gutterBottom>
-					Join Our Community
-				</Typography>
-				<Typography variant='body1' color='text.secondary' paragraph>
-					We're constantly evolving based on feedback from our community of clubs. Join us in revolutionizing grassroots
-					football management and be part of a growing network of forward-thinking teams.
-				</Typography>
+				{/* Final CTA */}
+				<Box
+					sx={{ py: 10, bgcolor: 'primary.main', color: 'primary.contrastText', textAlign: 'center', borderRadius: 2 }}
+				>
+					<Container>
+						<Typography variant='h4' gutterBottom fontWeight={700}>
+							Join Our Community
+						</Typography>
+						<Typography variant='h6' maxWidth='sm' mx='auto' mb={4}>
+							Be part of the grassroots football revolution. Your feedback helps shape the future of Match Replay.
+						</Typography>
+						<Stack direction='row' justifyContent='center' spacing={2}>
+							<Button variant='contained' color='secondary' size='large' href='/register'>
+								Get Started
+							</Button>
+							<Button variant='outlined' color='inherit' size='large' href='/contact'>
+								Contact Us
+							</Button>
+						</Stack>
+					</Container>
+				</Box>
 			</Container>
 		</Box>
 	);

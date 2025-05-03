@@ -186,7 +186,7 @@ export default function DashboardPage() {
 						}}
 						key={section.title}
 					>
-						<Link href={section.href} passHref legacyBehavior>
+						<Link href={section.href} passHref>
 							<Card
 								elevation={3}
 								sx={{

@@ -34,8 +34,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export const expandedDrawerWidth = 240;
-export const collapsedDrawerWidth = 100;
+const expandedDrawerWidth = 240;
+const collapsedDrawerWidth = 100;
 
 const navItems = [
 	{ text: 'Dashboard', href: '/administrator/dashboard', icon: <DashboardIcon /> },
@@ -277,7 +277,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 					flexGrow: 1,
 					width: { md: `calc(100% - ${collapsed ? collapsedDrawerWidth : expandedDrawerWidth}px)` },
 					mt: '64px',
-					minHeight: '100vh',
 					height: 'calc(100vh - 64px)',
 					overflow: 'auto',
 					backgroundColor: theme.palette.mode === 'light' ? '#f5f5f5' : theme.palette.background.default,

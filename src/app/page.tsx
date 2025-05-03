@@ -2,269 +2,177 @@
 
 import { Analytics, CalendarMonth, Groups, Payment, Security, VideoLibrary } from '@mui/icons-material';
 import { Avatar, Box, Button, Card, CardContent, Container, Grid, Stack, Typography } from '@mui/material';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
+
+const MotionBox = motion(Box);
+const MotionGrid = motion(Grid);
+
+const fadeInUp = {
+	hidden: { opacity: 0, y: 40 },
+	visible: (i: number) => ({
+		opacity: 1,
+		y: 0,
+		transition: { delay: i * 0.15 },
+	}),
+};
 
 export default function LandingPage() {
 	return (
 		<>
 			{/* Hero Section */}
-			<Box
+			<MotionBox
+				initial='hidden'
+				animate='visible'
+				variants={fadeInUp}
+				custom={0}
 				sx={{
 					minHeight: '90vh',
-					bgcolor: 'background.default',
+					backgroundImage:
+						'url(https://static.vecteezy.com/system/resources/thumbnails/028/142/355/small_2x/a-stadium-filled-with-excited-fans-a-football-field-in-the-foreground-background-with-empty-space-for-text-photo.jpg)',
+					backgroundSize: 'cover',
+					backgroundPosition: 'center',
 					display: 'flex',
 					alignItems: 'center',
+					justifyContent: 'center',
 					py: 10,
 					position: 'relative',
-					overflow: 'hidden',
+					textAlign: 'center',
+					'&::before': {
+						content: '""',
+						position: 'absolute',
+						inset: 0,
+						bgcolor: 'rgba(0, 0, 0, 0.6)', // Enable overlay
+						zIndex: 1,
+					},
 				}}
 			>
-				<Container>
-					<Grid container spacing={4} alignItems='center'>
-						<Grid size={{ xs: 12, md: 6 }}>
-							<Typography variant='h2' component='h1' gutterBottom sx={{ fontWeight: 700 }}>
-								Replay Every Match. Connect Every Player.
-							</Typography>
-							<Typography variant='h5' color='text.secondary' paragraph>
-								The all-in-one platform for modern football clubs. Streamline operations, enhance team performance, and
-								build a stronger community.
-							</Typography>
-							<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
-								<Button component={Link} href='/register' variant='contained' color='primary' size='large'>
-									Get Started Free
-								</Button>
-								<Button component={Link} href='/about' variant='outlined' color='primary' size='large'>
-									Learn More
-								</Button>
-							</Stack>
-						</Grid>
-						<Grid size={{ xs: 12, md: 6 }}>
-							<Box
-								sx={{
-									width: '100%',
-									height: 400,
-									bgcolor: 'grey.300',
-									borderRadius: 2,
-									position: 'relative',
-									overflow: 'hidden',
-									'&::before': {
-										content: '""',
-										position: 'absolute',
-										top: 0,
-										left: 0,
-										right: 0,
-										bottom: 0,
-										background: 'linear-gradient(45deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%)',
-									},
-								}}
-							/>
-						</Grid>
-					</Grid>
+				<Container sx={{ position: 'relative', zIndex: 2 }}>
+					<Typography
+						variant='h2'
+						component='h1'
+						gutterBottom
+						fontWeight={700}
+						sx={{
+							color: 'white',
+							textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
+						}}
+					>
+						Replay Every Match. Connect Every Player.
+					</Typography>
+					<Typography
+						variant='h5'
+						sx={{
+							color: 'white',
+							mb: 4,
+							textShadow: '1px 1px 3px rgba(0,0,0,0.7)',
+						}}
+					>
+						All-in-one platform for football clubs. Manage matches, track players, collect fines — from anywhere.
+					</Typography>
+					<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='center'>
+						<Button component={Link} href='/register' variant='contained' color='primary' size='large'>
+							Get Started Free
+						</Button>
+						<Button
+							component={Link}
+							href='/about'
+							variant='outlined'
+							color='primary'
+							size='large'
+							sx={{ color: 'white', borderColor: 'white' }}
+						>
+							Learn More
+						</Button>
+					</Stack>
 				</Container>
-			</Box>
+			</MotionBox>
 
 			{/* Features Section */}
 			<Box sx={{ py: 10, bgcolor: 'background.paper' }}>
 				<Container>
-					<Typography variant='h3' textAlign='center' gutterBottom sx={{ fontWeight: 700 }}>
+					<Typography variant='h3' textAlign='center' gutterBottom fontWeight={700}>
 						Everything Your Club Needs
 					</Typography>
 					<Typography variant='h6' color='text.secondary' textAlign='center' maxWidth='md' mx='auto' mb={6}>
-						From match analysis to team management, we've got you covered with powerful tools designed for modern
-						football clubs.
+						From match analysis to internal communication, Match Replay helps your club perform better on and off the
+						pitch.
 					</Typography>
 					<Grid container spacing={4}>
-						<Grid size={{ xs: 12, sm: 6, md: 4 }}>
-							<Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
-								<CardContent>
-									<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-										<Avatar sx={{ bgcolor: 'primary.main' }}>
-											<VideoLibrary />
-										</Avatar>
-										<Typography variant='h5'>Video Management</Typography>
-									</Stack>
-									<Typography variant='body1' color='text.secondary'>
-										Upload and organize match footage for full games, halves, and highlights. Review, relive, and
-										improve your team's performance with advanced analysis tools.
-									</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, sm: 6, md: 4 }}>
-							<Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
-								<CardContent>
-									<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-										<Avatar sx={{ bgcolor: 'primary.main' }}>
-											<Payment />
-										</Avatar>
-										<Typography variant='h5'>Smart Fines System</Typography>
-									</Stack>
-									<Typography variant='body1' color='text.secondary'>
-										Set customizable fine templates, assign them in seconds, and collect payments via Stripe.
-										Transparency and accountability built in.
-									</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, sm: 6, md: 4 }}>
-							<Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
-								<CardContent>
-									<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-										<Avatar sx={{ bgcolor: 'primary.main' }}>
-											<CalendarMonth />
-										</Avatar>
-										<Typography variant='h5'>Club Calendar</Typography>
-									</Stack>
-									<Typography variant='body1' color='text.secondary'>
-										Stay organized with a shared calendar. Plan matches, trainings, and events with real-time
-										participation tracking and automated reminders.
-									</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, sm: 6, md: 4 }}>
-							<Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
-								<CardContent>
-									<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-										<Avatar sx={{ bgcolor: 'primary.main' }}>
-											<Analytics />
-										</Avatar>
-										<Typography variant='h5'>Performance Analytics</Typography>
-									</Stack>
-									<Typography variant='body1' color='text.secondary'>
-										Track player and team performance with detailed statistics and insights. Make data-driven decisions
-										to improve your team's results.
-									</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, sm: 6, md: 4 }}>
-							<Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
-								<CardContent>
-									<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-										<Avatar sx={{ bgcolor: 'primary.main' }}>
-											<Groups />
-										</Avatar>
-										<Typography variant='h5'>Team Management</Typography>
-									</Stack>
-									<Typography variant='body1' color='text.secondary'>
-										Manage player rosters, track attendance, and handle team communications all in one place. Keep
-										everyone informed and engaged.
-									</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, sm: 6, md: 4 }}>
-							<Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
-								<CardContent>
-									<Stack direction='row' alignItems='center' spacing={2} mb={2}>
-										<Avatar sx={{ bgcolor: 'primary.main' }}>
-											<Security />
-										</Avatar>
-										<Typography variant='h5'>Secure Platform</Typography>
-									</Stack>
-									<Typography variant='body1' color='text.secondary'>
-										Enterprise-grade security to protect your team's data. Regular backups and privacy compliance ensure
-										your information is always safe.
-									</Typography>
-								</CardContent>
-							</Card>
-						</Grid>
+						{[
+							{
+								icon: <VideoLibrary />,
+								title: 'Video Management',
+								desc: 'Upload and organize footage — by match, half, or highlight.',
+							},
+							{
+								icon: <Payment />,
+								title: 'Smart Fines',
+								desc: 'Assign fines easily and let players pay directly online.',
+							},
+							{
+								icon: <CalendarMonth />,
+								title: 'Shared Calendar',
+								desc: 'Plan trainings, matches, and events — with RSVP tracking.',
+							},
+							{
+								icon: <Analytics />,
+								title: 'Stats & Insights',
+								desc: "Follow your squad's data: attendance, goals, and more.",
+							},
+							{
+								icon: <Groups />,
+								title: 'Roster Control',
+								desc: 'Add coaches and players to roles. Keep everything updated.',
+							},
+							{
+								icon: <Security />,
+								title: 'Secure & Reliable',
+								desc: 'Data is encrypted and backed up — peace of mind built in.',
+							},
+						].map((feat, idx) => (
+							<MotionGrid
+								size={{ xs: 12, sm: 6, md: 4 }}
+								key={feat.title}
+								initial='hidden'
+								animate='visible'
+								variants={fadeInUp}
+								custom={idx}
+							>
+								<Card
+									sx={{ height: '100%', p: 2, transition: 'all 0.3s', '&:hover': { transform: 'translateY(-4px)' } }}
+								>
+									<CardContent>
+										<Stack direction='row' spacing={2} alignItems='center' mb={2}>
+											<Avatar sx={{ bgcolor: 'primary.main' }}>{feat.icon}</Avatar>
+											<Typography variant='h6'>{feat.title}</Typography>
+										</Stack>
+										<Typography color='text.secondary'>{feat.desc}</Typography>
+									</CardContent>
+								</Card>
+							</MotionGrid>
+						))}
 					</Grid>
 				</Container>
 			</Box>
 
-			{/* Testimonials Section */}
-			<Box sx={{ py: 10, bgcolor: 'background.default' }}>
-				<Container>
-					<Typography variant='h3' textAlign='center' gutterBottom sx={{ fontWeight: 700 }}>
-						Trusted by Football Clubs
-					</Typography>
-					<Typography variant='h6' color='text.secondary' textAlign='center' maxWidth='md' mx='auto' mb={6}>
-						Join hundreds of clubs who have transformed their operations with Match Replay
-					</Typography>
-					<Grid container spacing={4}>
-						<Grid size={{ xs: 12, md: 4 }}>
-							<Card sx={{ height: '100%' }}>
-								<CardContent>
-									<Typography variant='body1' color='text.secondary' paragraph>
-										"Match Replay has revolutionized how we manage our club. The video analysis tools have helped us
-										improve our game significantly."
-									</Typography>
-									<Stack direction='row' spacing={2} alignItems='center'>
-										<Avatar />
-										<Box>
-											<Typography variant='subtitle1'>John Smith</Typography>
-											<Typography variant='body2' color='text.secondary'>
-												Manager, FC United
-											</Typography>
-										</Box>
-									</Stack>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, md: 4 }}>
-							<Card sx={{ height: '100%' }}>
-								<CardContent>
-									<Typography variant='body1' color='text.secondary' paragraph>
-										"The fines system has made our lives so much easier. No more chasing payments or keeping track of
-										spreadsheets."
-									</Typography>
-									<Stack direction='row' spacing={2} alignItems='center'>
-										<Avatar />
-										<Box>
-											<Typography variant='subtitle1'>Sarah Johnson</Typography>
-											<Typography variant='body2' color='text.secondary'>
-												Treasurer, City FC
-											</Typography>
-										</Box>
-									</Stack>
-								</CardContent>
-							</Card>
-						</Grid>
-						<Grid size={{ xs: 12, md: 4 }}>
-							<Card sx={{ height: '100%' }}>
-								<CardContent>
-									<Typography variant='body1' color='text.secondary' paragraph>
-										"Finally, a platform that understands what grassroots football clubs need. The calendar feature
-										alone has saved us countless hours."
-									</Typography>
-									<Stack direction='row' spacing={2} alignItems='center'>
-										<Avatar />
-										<Box>
-											<Typography variant='subtitle1'>Mike Brown</Typography>
-											<Typography variant='body2' color='text.secondary'>
-												Coach, Athletic FC
-											</Typography>
-										</Box>
-									</Stack>
-								</CardContent>
-							</Card>
-						</Grid>
-					</Grid>
-				</Container>
-			</Box>
-
-			{/* CTA Section */}
+			{/* Call to Action */}
 			<Box sx={{ py: 10, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
 				<Container>
 					<Grid container spacing={4} alignItems='center'>
 						<Grid size={{ xs: 12, md: 8 }}>
-							<Typography variant='h3' gutterBottom sx={{ fontWeight: 700 }}>
-								Ready to Transform Your Club?
+							<Typography variant='h3' gutterBottom fontWeight={700}>
+								Ready to Join the Replay Revolution?
 							</Typography>
-							<Typography variant='h6' paragraph>
-								Join the growing community of football clubs using Match Replay to streamline their operations and
-								enhance team performance.
-							</Typography>
+							<Typography variant='h6'>Sign up now and give your club the digital tools it deserves.</Typography>
 						</Grid>
 						<Grid size={{ xs: 12, md: 4 }}>
-							<Stack direction='column' spacing={2}>
-								<Button component={Link} href='/register' variant='contained' color='secondary' size='large' fullWidth>
-									Start Free Trial
+							<Stack spacing={2}>
+								<Button component={Link} href='/register' variant='contained' color='secondary' size='large'>
+									Start Now
 								</Button>
-								<Button component={Link} href='/about' variant='outlined' color='inherit' size='large' fullWidth>
-									Learn More
+								<Button component={Link} href='/contact' variant='outlined' color='inherit' size='large'>
+									Contact Us
 								</Button>
 							</Stack>
 						</Grid>
