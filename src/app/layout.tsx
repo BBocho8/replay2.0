@@ -1,3 +1,4 @@
+import FooterLanding from '@/components/main-components/FooterLanding';
 import NavbarManager from '@/components/main-components/NavbarManager';
 import { ThemeRegistry } from '@/theme';
 import '@/utils/dayjs';
@@ -8,7 +9,6 @@ import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Footer from '../components/main-components/Footer';
 import './globals.css';
 
 const roboto = Roboto({
@@ -27,17 +27,15 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={`${roboto.className} antialiased`}>
+			<body className={`${roboto} antialiased`}>
 				<ThemeRegistry>
 					<ToastContainer />
 					<SpeedInsights />
 					<Analytics />
 					<SWRProvider>
-						<main>
-							<NavbarManager />
-							{children}
-							<Footer />
-						</main>
+						<NavbarManager />
+						<main>{children}</main>
+						<FooterLanding />
 					</SWRProvider>
 				</ThemeRegistry>
 			</body>

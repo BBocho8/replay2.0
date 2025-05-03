@@ -1,57 +1,60 @@
 import type { Config } from 'tailwindcss';
-import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
-	content: [
-		'./src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-		'./src/components/**/*.{js,ts,jsx,tsx,mdx}',
-		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
-	],
+	content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './pages/**/*.{ts,tsx}', './utils/**/*.{ts,tsx}'],
 	theme: {
 		extend: {
-			boxShadow: {
-				btn: '0 1px 3px rgba(0, 0, 0, 0.2)',
-			},
 			colors: {
-				primaryGreen: '#15A34A',
+				primary: {
+					light: '#1976d2',
+					dark: '#90caf9',
+				},
+				secondary: {
+					light: '#9c27b0',
+					dark: '#ce93d8',
+				},
+				background: {
+					light: '#f5f5f5',
+					dark: '#121212',
+				},
+				surface: {
+					light: '#ffffff',
+					dark: '#1e1e1e',
+				},
+				text: {
+					light: '#1a1a1a',
+					dark: '#f5f5f5',
+				},
 			},
 			fontFamily: {
-				sans: ['Roboto', ...defaultTheme.fontFamily.sans],
+				sans: ['Roboto', 'sans-serif'],
 			},
 			fontSize: {
-				nav: '1.5rem',
-				linksNav: '1rem',
-				h1: '2.5rem',
-				h2: '2rem',
-				h3: '1.5rem',
-				h4: '0.875rem',
-				h1BigScreen: '4rem',
-				h2BigScreen: '2rem',
-				h3BigScreen: '1rem',
-				h4BigScreen: '1rem',
-				body: '1rem',
-				btn: '0.875rem',
+				sm: '0.875rem',
+				base: '1rem',
+				lg: '1.125rem',
+				xl: '1.25rem',
+				'2xl': '1.5rem',
+				'3xl': '1.875rem',
+				'4xl': '2.25rem',
+				'5xl': '3rem',
+				'6xl': '3.75rem',
 			},
-			lineHeight: {
-				header: '1.25',
-				headerBigScreen: '1',
+			spacing: {
+				4: '1rem',
+				6: '1.5rem',
+				8: '2rem',
+				10: '2.5rem',
+				12: '3rem',
 			},
-			height: {
-				nav: 'calc(100vh - 72px)',
-			},
-			letterSpacing: {
-				header: '0.10rem',
-				btn: '0.25rem',
-			},
-			padding: {
-				btnX: '0.75rem',
-				btnY: '0.375rem',
-			},
-			screens: {
-				nav: '800px',
+			borderRadius: {
+				DEFAULT: '8px',
+				lg: '12px',
 			},
 		},
 	},
+	darkMode: 'class',
 	plugins: [],
 };
+
 export default config;

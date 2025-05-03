@@ -1,46 +1,53 @@
 'use client';
 
-import { CacheProvider, ThemeProvider } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import createEmotionCache from './emotion-cache';
-import themeCreator from './theme';
+import { darkThemeOptions, lightThemeOptions } from './theme';
 
-const ColorModeContext = createContext({ toggleColorMode: () => {} });
+interface ThemeContextValue {
+	toggleColorMode: () => void;
+	mode: 'light' | 'dark';
+}
 
-const clientSideEmotionCache = createEmotionCache(); // ✅ Only create once!
+const ColorModeContext = createContext<ThemeContextValue>({
+	toggleColorMode: () => {},
+	mode: 'light',
+});
 
 export function ThemeRegistry({ children }: { children: React.ReactNode }) {
 	const [mode, setMode] = useState<'light' | 'dark'>('light');
 
 	useEffect(() => {
-		const storedMode = localStorage.getItem('theme-mode') as 'light' | 'dark' | null;
-
-		if (storedMode) {
-			setMode(storedMode);
+		const saved = localStorage.getItem('theme-mode') as 'light' | 'dark' | null;
+		if (saved) {
+			setMode(saved);
 		} else {
-			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			setMode(prefersDark ? 'dark' : 'light');
+			setMode(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 		}
 	}, []);
 
-	const colorMode = useMemo(
+	const colorMode = useMemo<ThemeContextValue>(
 		() => ({
 			toggleColorMode: () => {
 				setMode(prev => {
-					const newMode = prev === 'light' ? 'dark' : 'light';
-					localStorage.setItem('theme-mode', newMode);
-					return newMode;
+					const next = prev === 'light' ? 'dark' : 'light';
+					localStorage.setItem('theme-mode', next);
+					return next;
 				});
 			},
+			mode,
 		}),
-		[],
+		[mode],
 	);
 
-	const theme = useMemo(() => themeCreator(mode), [mode]);
+	const theme = useMemo(() => createTheme(mode === 'light' ? lightThemeOptions : darkThemeOptions), [mode]);
+	const emotionCache = useMemo(() => createEmotionCache(), []);
 
 	return (
-		<CacheProvider value={clientSideEmotionCache}>
-			<ColorModeContext.Provider value={colorMode}>
+		<CacheProvider value={emotionCache}>
+			<ColorModeContext.Provider value={{ mode, toggleColorMode: colorMode.toggleColorMode }}>
 				<ThemeProvider theme={theme}>{children}</ThemeProvider>
 			</ColorModeContext.Provider>
 		</CacheProvider>
