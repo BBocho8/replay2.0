@@ -44,3 +44,13 @@ export interface Match {
 	created_by: string;
 	club_id: string;
 }
+
+export interface Video {
+	id: string;
+	match_id: string;
+	created_at: string;
+	created_by: string;
+	url: string;
+	label?: string;
+	club_id: string;
+}

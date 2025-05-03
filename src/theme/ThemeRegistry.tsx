@@ -1,10 +1,13 @@
 'use client';
 
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { CacheProvider, ThemeProvider } from '@emotion/react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import createEmotionCache from './emotion-cache';
 import themeCreator from './theme';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
+
+const clientSideEmotionCache = createEmotionCache(); // ✅ Only create once!
 
 export function ThemeRegistry({ children }: { children: React.ReactNode }) {
 	const [mode, setMode] = useState<'light' | 'dark'>('light');
@@ -15,7 +18,6 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
 		if (storedMode) {
 			setMode(storedMode);
 		} else {
-			// No saved mode? Detect system preference
 			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 			setMode(prefersDark ? 'dark' : 'light');
 		}
@@ -24,8 +26,8 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
 	const colorMode = useMemo(
 		() => ({
 			toggleColorMode: () => {
-				setMode(prevMode => {
-					const newMode = prevMode === 'light' ? 'dark' : 'light';
+				setMode(prev => {
+					const newMode = prev === 'light' ? 'dark' : 'light';
 					localStorage.setItem('theme-mode', newMode);
 					return newMode;
 				});
@@ -37,12 +39,11 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
 	const theme = useMemo(() => themeCreator(mode), [mode]);
 
 	return (
-		<ColorModeContext.Provider value={colorMode}>
-			<ThemeProvider theme={theme}>
-				<CssBaseline />
-				{children}
-			</ThemeProvider>
-		</ColorModeContext.Provider>
+		<CacheProvider value={clientSideEmotionCache}>
+			<ColorModeContext.Provider value={colorMode}>
+				<ThemeProvider theme={theme}>{children}</ThemeProvider>
+			</ColorModeContext.Provider>
+		</CacheProvider>
 	);
 }
 

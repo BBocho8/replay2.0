@@ -1,5 +1,6 @@
 import NavbarManager from '@/components/main-components/NavbarManager';
 import { ThemeRegistry } from '@/theme';
+import '@/utils/dayjs';
 import { SWRProvider } from '@/utils/swr/swr-provider';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -26,7 +27,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={`${roboto} antialiased`}>
+			<body className={`${roboto.className} antialiased`}>
 				<ThemeRegistry>
 					<ToastContainer />
 					<SpeedInsights />

@@ -1,12 +1,15 @@
 'use client';
 
+import AddVideoDialog from '@/components/matches/AddVideoDialog';
 import DeleteMatchDialog from '@/components/matches/DeleteMatchDialog';
 import EditMatchDialog from '@/components/matches/EditMatchDialog';
+import MatchVideoList from '@/components/matches/MatchVideoList';
 import NewMatchDialog from '@/components/matches/NewMatchDialog';
 import { usePagination } from '@/utils/mui/use-pagination';
 import { createClient } from '@/utils/supabase/supabaseClient';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import {
 	Box,
 	Button,
@@ -24,7 +27,7 @@ import {
 	Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { toast } from 'react-toastify';
 import useSWR, { useSWRConfig } from 'swr';
 
@@ -33,7 +36,7 @@ const supabase = createClient();
 async function fetchMatches() {
 	const { data, error } = await supabase
 		.from('matches')
-		.select('id, home_team, away_team, home_score, away_score, date, competition_id, competitions(name)')
+		.select('id, home_team, away_team, home_score, away_score, date, competition_id, competitions(name), club_id')
 		.order('date', { ascending: false });
 
 	if (error) {
@@ -49,11 +52,12 @@ export default function ManageMatchesPage() {
 	const [selectedMatch, setSelectedMatch] = useState<any>(null);
 	const [openEditDialog, setOpenEditDialog] = useState(false);
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+	const [openVideoDialog, setOpenVideoDialog] = useState(false);
 	const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 	const { mutate } = useSWRConfig();
 	const [searchQuery, setSearchQuery] = useState('');
+	const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
-	// Pagination state
 	const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = usePagination();
 
 	if (isLoading) {
@@ -118,43 +122,86 @@ export default function ManageMatchesPage() {
 						</TableHead>
 						<TableBody>
 							{filteredMatches.length > 0 ? (
-								filteredMatches.map((match: any) => (
-									<TableRow key={match.id} hover>
-										<TableCell>{match.home_team}</TableCell>
-										<TableCell>{match.away_team}</TableCell>
-										<TableCell>{dayjs(match?.date).format('MMM D, YYYY HH:mm')}</TableCell>
-										<TableCell>
-											{match.home_score != null && match.away_score != null
-												? `${match.home_score} - ${match.away_score}`
-												: 'Not played yet'}
-										</TableCell>
-										<TableCell>{match?.competitions?.name}</TableCell>
-										<TableCell align='right'>
-											<Box display='flex' justifyContent='flex-end' gap={1}>
-												<IconButton
-													edge='end'
-													aria-label='edit'
-													onClick={() => {
-														setSelectedMatch(match);
-														setOpenEditDialog(true);
-													}}
-												>
-													<EditIcon />
-												</IconButton>
-												<IconButton
-													edge='end'
-													aria-label='delete'
-													onClick={() => {
-														setSelectedMatchId(match.id);
-														setOpenDeleteDialog(true);
-													}}
-												>
-													<DeleteIcon />
-												</IconButton>
-											</Box>
-										</TableCell>
-									</TableRow>
-								))
+								filteredMatches.map((match: any) => {
+									const isExpanded = expandedMatchId === match.id;
+
+									return (
+										<Fragment key={match.id}>
+											<TableRow hover>
+												<TableCell>{match.home_team}</TableCell>
+												<TableCell>{match.away_team}</TableCell>
+												<TableCell>{dayjs(match?.date).format('MMM D, YYYY HH:mm')}</TableCell>
+												<TableCell>
+													{match.home_score != null && match.away_score != null
+														? `${match.home_score} - ${match.away_score}`
+														: 'Not played yet'}
+												</TableCell>
+												<TableCell>{match?.competitions?.name}</TableCell>
+												<TableCell align='right'>
+													<Box display='flex' justifyContent='flex-end' gap={1}>
+														<IconButton
+															onClick={() => setExpandedMatchId(prev => (prev === match.id ? null : match.id))}
+														>
+															{isExpanded ? <VideoLibraryIcon /> : <VideoLibraryIcon color='action' />}
+														</IconButton>
+														<IconButton
+															onClick={() => {
+																setSelectedMatch(match);
+																setOpenEditDialog(true);
+															}}
+														>
+															<EditIcon />
+														</IconButton>
+														<IconButton
+															onClick={() => {
+																setSelectedMatchId(match.id);
+																setOpenDeleteDialog(true);
+															}}
+														>
+															<DeleteIcon />
+														</IconButton>
+													</Box>
+												</TableCell>
+											</TableRow>
+
+											{isExpanded && (
+												<TableRow>
+													<TableCell colSpan={6}>
+														<Box p={2}>
+															<Typography variant='subtitle1' fontWeight='bold' gutterBottom>
+																Videos for {match.home_team} vs {match.away_team}
+															</Typography>
+
+															<MatchVideoList matchId={match.id} />
+
+															<Box mt={2} display='flex' justifyContent='end'>
+																<AddVideoDialog
+																	open={openVideoDialog && selectedMatch?.id === match.id}
+																	onClose={() => setOpenVideoDialog(false)}
+																	onCreated={() => mutate(`videos-${match.id}`)}
+																	matchId={match.id}
+																	matchLabel={`${match.home_team} vs ${match.away_team}`}
+																/>
+
+																<Button
+																	variant='outlined'
+																	size='small'
+																	onClick={() => {
+																		setSelectedMatch(match);
+																		setOpenVideoDialog(true);
+																	}}
+																	sx={{ mt: 1 }}
+																>
+																	Add Video
+																</Button>
+															</Box>
+														</Box>
+													</TableCell>
+												</TableRow>
+											)}
+										</Fragment>
+									);
+								})
 							) : (
 								<TableRow>
 									<TableCell colSpan={6} align='center'>
