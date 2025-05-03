@@ -1,17 +1,21 @@
 'use client';
 
 import { useColorMode } from '@/theme/ThemeRegistry';
-import { Brightness4, Brightness7 } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import { IconButton, Tooltip } from '@mui/material';
 
-export default function DarkModeToggleButton() {
-	const theme = useTheme();
-	const colorMode = useColorMode();
+export default function ThemeToggle() {
+	const { toggleColorMode, mode } = useColorMode();
+
+	const isLightMode = mode === 'light';
+	const nextMode = isLightMode ? 'dark' : 'light';
 
 	return (
-		<IconButton onClick={colorMode.toggleColorMode} color='inherit'>
-			{theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
-		</IconButton>
+		<Tooltip title={`Switch to ${nextMode} mode`}>
+			<IconButton onClick={toggleColorMode} color='inherit' aria-label={`Switch to ${nextMode} mode`}>
+				{isLightMode ? <DarkModeIcon /> : <LightModeIcon />}
+			</IconButton>
+		</Tooltip>
 	);
 }

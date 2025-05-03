@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/supabaseClient';
+import { Box, Button, Container, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -20,7 +21,6 @@ export default function CompleteProfilePage() {
 		isLoading,
 	} = useSWR('clubs', async () => {
 		const { data, error } = await supabase.from('clubs').select('id, name').eq('is_validated', true);
-
 		if (error) throw error;
 		return data;
 	});
@@ -48,7 +48,6 @@ export default function CompleteProfilePage() {
 					return;
 				}
 
-				// Create new club
 				const { data: createdClub, error: clubError } = await supabase
 					.from('clubs')
 					.insert({ name: newClubName, is_validated: true })
@@ -64,7 +63,6 @@ export default function CompleteProfilePage() {
 				finalClubId = createdClub.id;
 			}
 
-			// Create user profile
 			await supabase.from('users').insert({
 				id: user.id,
 				full_name: fullName,
@@ -75,8 +73,6 @@ export default function CompleteProfilePage() {
 			});
 
 			toast.success('Profile completed successfully!');
-
-			// Redirect
 			router.push(`${role === 'admin' ? '/administrator' : '/pending-approval'}`);
 		} catch (error) {
 			console.error(error);
@@ -84,68 +80,74 @@ export default function CompleteProfilePage() {
 		}
 	};
 
-	if (isLoading) return <p>Loading...</p>;
-	if (error) return <p>Failed to load clubs.</p>;
+	if (isLoading) return <Typography>Loading...</Typography>;
+	if (error) return <Typography color='error'>Failed to load clubs.</Typography>;
 
 	return (
-		<div className='min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6'>
-			<div className='w-full max-w-md bg-white rounded-lg p-8 shadow'>
-				<h1 className='text-2xl font-bold mb-6 text-center'>Complete Your Profile</h1>
-
-				<input
-					type='text'
-					className='w-full p-3 mb-4 border rounded focus:outline-none'
-					placeholder='Full Name'
-					value={fullName}
-					onChange={e => setFullName(e.target.value)}
-				/>
-
-				<select
-					className='w-full p-3 mb-4 border rounded focus:outline-none'
-					value={role}
-					onChange={e => {
-						setRole(e.target.value as 'player' | 'coach' | 'admin');
-						// Reset club fields
-						setClubId('');
-						setNewClubName('');
+		<Box
+			sx={{
+				minHeight: '100vh',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				bgcolor: 'background.default',
+			}}
+		>
+			<Container maxWidth='sm'>
+				<Box
+					sx={{
+						p: 4,
+						bgcolor: 'background.paper',
+						borderRadius: 2,
+						boxShadow: 3,
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 2,
 					}}
 				>
-					<option value='player'>Player</option>
-					<option value='coach'>Coach</option>
-					<option value='admin'>Admin</option>
-				</select>
+					<Typography variant='h5' fontWeight='bold' align='center'>
+						Complete Your Profile
+					</Typography>
 
-				{role === 'admin' ? (
-					<input
-						type='text'
-						className='w-full p-3 mb-4 border rounded focus:outline-none'
-						placeholder='New Club Name'
-						value={newClubName}
-						onChange={e => setNewClubName(e.target.value)}
-					/>
-				) : (
-					<select
-						className='w-full p-3 mb-6 border rounded focus:outline-none'
-						value={clubId}
-						onChange={e => setClubId(e.target.value)}
+					<TextField label='Full Name' fullWidth value={fullName} onChange={e => setFullName(e.target.value)} />
+
+					<Select
+						value={role}
+						onChange={e => {
+							setRole(e.target.value as 'player' | 'coach' | 'admin');
+							setClubId('');
+							setNewClubName('');
+						}}
+						fullWidth
 					>
-						<option value=''>Select Your Club</option>
-						{clubs?.map(club => (
-							<option key={club.id} value={club.id}>
-								{club.name}
-							</option>
-						))}
-					</select>
-				)}
+						<MenuItem value='player'>Player</MenuItem>
+						<MenuItem value='coach'>Coach</MenuItem>
+						<MenuItem value='admin'>Admin</MenuItem>
+					</Select>
 
-				<button
-					type='button'
-					onClick={handleSubmit}
-					className='w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
-				>
-					Complete Profile
-				</button>
-			</div>
-		</div>
+					{role === 'admin' ? (
+						<TextField
+							label='New Club Name'
+							fullWidth
+							value={newClubName}
+							onChange={e => setNewClubName(e.target.value)}
+						/>
+					) : (
+						<Select value={clubId} onChange={e => setClubId(e.target.value)} fullWidth displayEmpty>
+							<MenuItem value=''>Select Your Club</MenuItem>
+							{clubs?.map(club => (
+								<MenuItem key={club.id} value={club.id}>
+									{club.name}
+								</MenuItem>
+							))}
+						</Select>
+					)}
+
+					<Button variant='contained' onClick={handleSubmit} fullWidth>
+						Complete Profile
+					</Button>
+				</Box>
+			</Container>
+		</Box>
 	);
 }
