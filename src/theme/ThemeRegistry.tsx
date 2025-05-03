@@ -42,7 +42,10 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
 		[mode],
 	);
 
-	const theme = useMemo(() => createTheme(mode === 'light' ? lightThemeOptions : darkThemeOptions), [mode]);
+	const theme = useMemo(() => {
+		const base = createTheme({ palette: { mode } }); // set mode here
+		return createTheme(base, mode === 'light' ? lightThemeOptions : darkThemeOptions);
+	}, [mode]);
 	const emotionCache = useMemo(() => createEmotionCache(), []);
 
 	return (

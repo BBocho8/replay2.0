@@ -1,6 +1,7 @@
 'use client';
 
 import DarkModeToggleButton from '@/components/main-components/DarkModeToggleButton';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -8,6 +9,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import MenuIcon from '@mui/icons-material/Menu';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import PeopleIcon from '@mui/icons-material/People';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import {
@@ -36,6 +38,8 @@ const navItems = [
 	{ text: 'Manage Competitions', href: '/administrator/competitions', icon: <EmojiEventsIcon /> },
 	{ text: 'Manage Players/Coaches', href: '/administrator/users', icon: <PeopleIcon /> },
 	{ text: 'Manage Clubs', href: '/administrator/clubs', icon: <HomeWorkIcon /> },
+	{ text: 'Manage Calendar', href: '/administrator/calendar', icon: <CalendarMonthIcon /> },
+	{ text: 'Manage Fines', href: '/administrator/fines', icon: <MonetizationOnIcon /> },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -74,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 				color: 'text.primary',
 			}}
 		>
-			<Box className='p-4 flex items-center justify-between'>
+			<Box px={2} py={1.5} display='flex' alignItems='center' justifyContent='space-between'>
 				{!collapsed && (
 					<Typography fontWeight='bold' fontSize='1.25rem'>
 						Admin
@@ -87,14 +91,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 				)}
 			</Box>
 
-			<List className='flex-1'>
+			<List sx={{ flexGrow: 1 }}>
 				{navItems.map(item => (
 					<Link key={item.href} href={item.href} passHref>
 						<Tooltip title={collapsed ? item.text : ''} placement='right'>
 							<ListItemButton
 								selected={pathname.startsWith(item.href)}
-								className='rounded-lg mx-2 my-1 flex-col md:flex-row md:items-center'
 								sx={{
+									borderRadius: 2,
+									mx: 1,
+									my: 0.5,
 									color: 'inherit',
 									backgroundColor: pathname.startsWith(item.href)
 										? theme.palette.mode === 'light'
@@ -105,31 +111,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 										backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.16)',
 									},
 									justifyContent: 'center',
-									alignItems: { xs: 'center', md: collapsed ? 'center' : 'flex-start' },
+									alignItems: collapsed ? 'center' : 'flex-start',
 									py: collapsed ? 2 : 1,
 								}}
 							>
-								<Box display='flex' flexDirection='column' alignItems='center' justifyContent='center'>
-									<Box
-										sx={{
-											fontSize: collapsed ? '1.5rem' : '1.25rem',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											transition: 'font-size 0.3s ease',
-										}}
-									>
+								<Box display='flex' flexDirection='column' alignItems='center'>
+									<Box sx={{ fontSize: collapsed ? '1.5rem' : '1.25rem', transition: 'font-size 0.3s ease' }}>
 										{item.icon}
 									</Box>
 									<Typography
 										variant='caption'
-										sx={{
-											color: 'text.primary',
-											fontSize: collapsed ? '0.6rem' : '1rem',
-											mt: 0.5,
-											display: 'block', // 🛠 Always block
-											textAlign: 'center',
-										}}
+										sx={{ mt: 0.5, fontSize: collapsed ? '0.6rem' : '1rem', textAlign: 'center' }}
 									>
 										{item.text}
 									</Typography>
@@ -140,40 +132,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 				))}
 			</List>
 
-			{/* Exit Admin Button */}
 			<Link href='/' passHref>
 				<ListItemButton
-					className='rounded-lg mx-2 my-1 flex-col md:flex-row md:items-center'
 					sx={{
+						borderRadius: 2,
+						mx: 1,
+						my: 0.5,
 						color: 'inherit',
 						backgroundColor: 'rgba(255,255,255,0.05)',
 						'&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' },
 						justifyContent: 'center',
-						alignItems: { xs: 'center', md: collapsed ? 'center' : 'flex-start' },
+						alignItems: collapsed ? 'center' : 'flex-start',
 						py: collapsed ? 2 : 1,
 					}}
 				>
-					<Box display='flex' flexDirection='column' alignItems='center' justifyContent='center'>
-						<Box
-							sx={{
-								fontSize: collapsed ? '1.5rem' : '1.25rem',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								transition: 'font-size 0.3s ease',
-							}}
-						>
+					<Box display='flex' flexDirection='column' alignItems='center'>
+						<Box sx={{ fontSize: collapsed ? '1.5rem' : '1.25rem', transition: 'font-size 0.3s ease' }}>
 							<ExitToAppIcon />
 						</Box>
 						<Typography
 							variant='caption'
-							sx={{
-								color: 'text.primary',
-								fontSize: collapsed ? '0.6rem' : '1rem',
-								mt: 0.5,
-								display: 'block', // 🛠 Always block
-								textAlign: 'center',
-							}}
+							sx={{ mt: 0.5, fontSize: collapsed ? '0.6rem' : '1rem', textAlign: 'center' }}
 						>
 							Exit Admin
 						</Typography>
@@ -181,15 +160,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 				</ListItemButton>
 			</Link>
 
-			<Box className='p-4 flex justify-center'>
+			<Box p={2} display='flex' justifyContent='center'>
 				<DarkModeToggleButton />
 			</Box>
 		</Box>
 	);
 
 	return (
-		<Box className='flex h-screen'>
-			{/* AppBar */}
+		<Box display='flex' height='100vh'>
 			<AppBar
 				position='fixed'
 				sx={{
@@ -200,7 +178,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 					boxShadow: theme.palette.mode === 'dark' ? '0 1px 2px rgba(0,0,0,0.5)' : '0 1px 2px rgba(0,0,0,0.1)',
 				}}
 			>
-				<Toolbar className='flex justify-between'>
+				<Toolbar sx={{ justifyContent: 'space-between' }}>
 					{isMobile && (
 						<IconButton color='inherit' edge='start' onClick={toggleDrawer}>
 							<MenuIcon />
@@ -212,7 +190,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 					{!isMobile && <DarkModeToggleButton />}
 				</Toolbar>
 			</AppBar>
-			{/* Sidebar */}
+
 			<nav>
 				{isMobile ? (
 					<Drawer
@@ -249,15 +227,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 					</Drawer>
 				)}
 			</nav>
-			{/* Page Content */}
+
 			<main
-				className='flex-1 overflow-y-auto p-6 mt-[64px] transition-all duration-300'
 				style={{
+					flexGrow: 1,
+					padding: theme.spacing(3),
+					marginTop: 64,
 					backgroundColor: theme.palette.mode === 'light' ? '#f5f5f5' : theme.palette.background.default,
+					transition: 'all 0.3s ease',
 				}}
 			>
 				{children}
-			</main>{' '}
+			</main>
 		</Box>
 	);
 }

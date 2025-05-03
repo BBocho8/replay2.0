@@ -54,3 +54,27 @@ export interface Video {
 	label?: string;
 	club_id: string;
 }
+
+export interface Event {
+	id: string;
+	club_id: string;
+	title: string;
+	description?: string;
+	start_time: string; // ISO string
+	end_time: string; // ISO string
+	type: 'game' | 'training' | 'meeting' | 'other';
+	created_by: string;
+	created_at: string;
+}
+
+export interface EventWithParticipants extends Event {
+	invited_user_ids?: string[];
+}
+
+export interface EventParticipant {
+	id: string; // UUID
+	event_id: string;
+	user_id: string;
+	status: 'invited' | 'accepted' | 'declined';
+	created_at: string;
+}

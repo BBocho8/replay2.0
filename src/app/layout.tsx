@@ -27,15 +27,18 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={`${roboto} antialiased`}>
+			<body className={`${roboto.className} antialiased`}>
 				<ThemeRegistry>
 					<ToastContainer />
 					<SpeedInsights />
 					<Analytics />
 					<SWRProvider>
-						<NavbarManager />
-						<main>{children}</main>
-						<FooterLanding />
+						{/* Page Wrapper */}
+						<div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+							<NavbarManager />
+							<main style={{ flex: 1 }}>{children}</main>
+							<FooterLanding />
+						</div>
 					</SWRProvider>
 				</ThemeRegistry>
 			</body>

@@ -1,146 +1,85 @@
 'use client';
 
 import { useDashboardStats } from '@/hook/useDashboardStats';
-import { createClient } from '@/utils/supabase/supabaseClient';
-import { Button, Card, CardContent, CircularProgress, Typography } from '@mui/material';
-import dayjs from 'dayjs';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import HomeWorkIcon from '@mui/icons-material/HomeWork';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import PeopleIcon from '@mui/icons-material/People';
+import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
+import { Box, Card, CardActionArea, CardContent, Grid, Typography } from '@mui/material';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-const supabase = createClient();
+const sections = [
+	{ title: 'Matches', icon: <SportsSoccerIcon fontSize='large' />, href: '/administrator/matches' },
+	{ title: 'Competitions', icon: <EmojiEventsIcon fontSize='large' />, href: '/administrator/competitions' },
+	{ title: 'Users', icon: <PeopleIcon fontSize='large' />, href: '/administrator/users' },
+	{ title: 'Clubs', icon: <HomeWorkIcon fontSize='large' />, href: '/administrator/clubs' },
+	{ title: 'Calendar', icon: <CalendarMonthIcon fontSize='large' />, href: '/administrator/calendar' },
+	{ title: 'Fines', icon: <MonetizationOnIcon fontSize='large' />, href: '/administrator/fines' },
+];
 
 export default function DashboardPage() {
 	const { stats, isLoading: statsLoading, error: statsError } = useDashboardStats();
-	const [recentMatches, setRecentMatches] = useState<
-		{
-			id: string;
-			home_team: string;
-			away_team: string;
-			home_score: number | null;
-			away_score: number | null;
-			date: string;
-		}[]
-	>([]);
-	const [loadingMatches, setLoadingMatches] = useState(true);
-
-	useEffect(() => {
-		const fetchRecentMatches = async () => {
-			const { data, error } = await supabase
-				.from('matches')
-				.select('id, home_team, away_team, home_score, away_score, date')
-				.order('date', { ascending: false })
-				.limit(5); // Last 5 matches
-
-			if (!error && data) {
-				setRecentMatches(data);
-			}
-			setLoadingMatches(false);
-		};
-
-		fetchRecentMatches();
-	}, []);
-
-	if (statsLoading || loadingMatches) {
-		return (
-			<div className='flex justify-center items-center h-60'>
-				<CircularProgress />
-			</div>
-		);
-	}
-
-	if (statsError) {
-		return (
-			<div className='flex justify-center items-center h-60'>
-				<Typography color='error'>Failed to load dashboard data.</Typography>
-			</div>
-		);
-	}
-
 	return (
-		<div className='p-6 space-y-8'>
-			{/* Quick Actions */}
-			<div className='flex flex-wrap gap-4'>
-				<Link href='/administrator/matches'>
-					<Button variant='contained' color='primary'>
-						Create Match
-					</Button>
-				</Link>
-				<Link href='/administrator/competitions'>
-					<Button variant='contained' color='secondary'>
-						Add Competition
-					</Button>
-				</Link>
-				<Link href='/administrator/users'>
-					<Button variant='outlined'>Manage Users</Button>
-				</Link>
-			</div>
+		<Box p={6}>
+			<Typography color='text.primary' variant='h4' fontWeight='bold' mb={4}>
+				Admin Dashboard
+			</Typography>
 
-			{/* Metrics */}
-			<div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-				<Card className='shadow'>
-					<CardContent>
-						<Typography variant='h6' className='mb-2'>
-							Matches Played
-						</Typography>
-						<Typography variant='h4'>{stats?.matches}</Typography>
-					</CardContent>
-				</Card>
-				<Card className='shadow'>
-					<CardContent>
-						<Typography variant='h6' className='mb-2'>
-							Competitions
-						</Typography>
-						<Typography variant='h4'>{stats?.competitions}</Typography>
-					</CardContent>
-				</Card>
-				<Card className='shadow'>
-					<CardContent>
-						<Typography variant='h6' className='mb-2'>
-							Players
-						</Typography>
-						<Typography variant='h4'>{stats?.players}</Typography>
-					</CardContent>
-				</Card>
-				<Card className='shadow'>
-					<CardContent>
-						<Typography variant='h6' className='mb-2'>
-							Coaches
-						</Typography>
-						<Typography variant='h4'>{stats?.coaches}</Typography>
-					</CardContent>
-				</Card>{' '}
-				<Card className='shadow'>
-					<CardContent>
-						<Typography variant='h6' className='mb-2'>
-							Admins
-						</Typography>
-						<Typography variant='h4'>{stats?.admins}</Typography>
-					</CardContent>
-				</Card>
-			</div>
+			<Grid container spacing={2} mb={4}>
+				{[
+					{ label: 'Players', value: stats?.players },
+					{ label: 'Coaches', value: stats?.coaches },
+					{ label: 'Admins', value: stats?.admins },
+					{ label: 'Competitions', value: stats?.competitions },
+					{ label: 'Matches Played', value: stats?.matches },
+				].map(stat => (
+					<Grid
+						size={{
+							xs: 12,
+							sm: 6,
+							md: 4,
+							lg: 2.4,
+						}}
+						key={stat.label}
+					>
+						<Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+							<CardContent>
+								<Typography variant='subtitle1' color='text.secondary'>
+									{stat.label}
+								</Typography>
+								<Typography variant='h5'>{stat.value ?? 0}</Typography>
+							</CardContent>
+						</Card>
+					</Grid>
+				))}
+			</Grid>
 
-			{/* Recent Matches */}
-			<div className='space-y-4'>
-				<Typography variant='h5'>Recent Matches</Typography>
-
-				{recentMatches.length === 0 ? (
-					<div className='text-gray-500'>No recent matches available.</div>
-				) : (
-					<ul className='space-y-2'>
-						{recentMatches.map(match => (
-							<li
-								key={match.id}
-								className='bg-white rounded p-4 shadow flex justify-between items-center dark:bg-gray-800'
-							>
-								<div className='font-medium'>
-									{match.home_team} vs {match.away_team}
-								</div>
-								<div className='text-sm text-gray-500'>{dayjs(match.date).format('DD/MM/YYYY')}</div>
-							</li>
-						))}
-					</ul>
-				)}
-			</div>
-		</div>
+			<Grid container spacing={4}>
+				{sections.map(section => (
+					<Grid
+						size={{
+							xs: 12,
+							sm: 6,
+							md: 4,
+							lg: 3,
+						}}
+						key={section.title}
+					>
+						<Link href={section.href} passHref legacyBehavior>
+							<Card elevation={3} sx={{ textAlign: 'center', p: 2 }}>
+								<CardActionArea sx={{ p: 3 }}>
+									{section.icon}
+									<Typography variant='h6' mt={1}>
+										{section.title}
+									</Typography>
+								</CardActionArea>
+							</Card>
+						</Link>
+					</Grid>
+				))}
+			</Grid>
+		</Box>
 	);
 }

@@ -65,7 +65,7 @@ export default function ManageCompetitionsPage() {
 
 	return (
 		<Box p={6}>
-			<Typography variant='h4' fontWeight='bold' mb={4}>
+			<Typography color='text.primary' variant='h4' fontWeight='bold' mb={4}>
 				Manage Competitions
 			</Typography>
 
