@@ -5,8 +5,8 @@ import { Avatar, Box, Button, Card, CardContent, Container, Grid, Stack, Typogra
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-const MotionBox = motion(Box);
-const MotionGrid = motion(Grid);
+const MotionBox = motion.create(Box);
+const MotionGrid = motion.create(Grid);
 
 const fadeInUp = {
 	hidden: { opacity: 0, y: 40 },
@@ -28,8 +28,7 @@ export default function LandingPage() {
 				custom={0}
 				sx={{
 					minHeight: '90vh',
-					backgroundImage:
-						'url(https://static.vecteezy.com/system/resources/thumbnails/028/142/355/small_2x/a-stadium-filled-with-excited-fans-a-football-field-in-the-foreground-background-with-empty-space-for-text-photo.jpg)',
+					backgroundImage: 'url(/images/hero-bg.jpg)',
 					backgroundSize: 'cover',
 					backgroundPosition: 'center',
 					display: 'flex',

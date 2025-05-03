@@ -1,10 +1,9 @@
 'use client';
 
-import { Box, Button, Container, Grid, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 
 export default function ContactPage() {
-	const theme = useTheme();
 	return (
 		<Box sx={{ py: 10, bgcolor: 'background.paper' }}>
 			<Container maxWidth='md'>
